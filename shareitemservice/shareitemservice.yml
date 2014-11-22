@@ -1,0 +1,7 @@
+server:
+  type: default
+  maxThreads: 1024
+
+
+awsAccessKeyId: AKIAJQVHRQNBFIDYDTWA
+awsSecretAccesskey: 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

@@ -1,0 +1,84 @@
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.sun.jersey.multipart.impl.MultiPartConfigProvider;
+import dao.S3ImageDao;
+import io.dropwizard.Application;
+import io.dropwizard.lifecycle.ExecutorServiceManager;
+import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Created by xinxinwang on 11/16/14.
+ */
+public class ShareItemServerMain extends Application<ShareItemServerConfiguration> {
+
+    public static void main(String[] args) throws Exception {
+        new ShareItemServerMain().run(args);
+    }
+
+    @Override
+    public void initialize(Bootstrap<ShareItemServerConfiguration> imageServerConfigurationBootstrap) {
+
+    }
+
+    @Override
+    public void run(ShareItemServerConfiguration config, Environment environment) throws Exception {
+
+        ObjectMapper objectMapper = environment.getObjectMapper();
+        objectMapper.registerModule(new JodaModule());
+        objectMapper.configure(SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS, false);
+        objectMapper.setDateFormat(new ISO8601DateFormat());
+
+
+        final AmazonS3Client s3Client = new AmazonS3Client(
+                new BasicAWSCredentials(config.getAwsAccessKeyId(), config.getAwsSecretAccesskey()));
+
+        final ShareItemController shareItemController = new ShareItemController(
+                config, new S3ImageDao(s3Client, config.getS3BucketName()),
+                getManagedListeningExecutorService(environment, 100, "item process pool")
+        );
+
+        final ShareItemResource shareItemResource = new ShareItemResource(shareItemController, environment.getObjectMapper());
+
+        environment.jersey().register(shareItemResource);
+        environment.jersey().register(MultiPartConfigProvider.class);
+        environment.jersey().register(com.sun.jersey.multipart.impl.MultiPartReaderServerSide.class);
+
+        environment.healthChecks().register("heartbeat", new HeartbeatHealthCheck());
+
+    }
+
+    private ListeningExecutorService getManagedListeningExecutorService(final Environment environment,
+                                                                        final int maxPoolSize,
+                                                                        final String name)
+    {
+
+
+        ExecutorService executorService = getListeningExecutorService(maxPoolSize, name);
+        final ListeningExecutorService listeningExecutorService = MoreExecutors.listeningDecorator(executorService);
+
+        environment.lifecycle().manage(new ExecutorServiceManager(listeningExecutorService,
+                io.dropwizard.util.Duration.seconds(5), name));
+        return listeningExecutorService;
+    }
+
+    private ExecutorService getListeningExecutorService(final int maxPoolSize, final String name)
+    {
+        return new ThreadPoolExecutor(maxPoolSize, maxPoolSize, 10, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<Runnable>(maxPoolSize),
+                new ThreadFactoryBuilder().setDaemon(true).setNameFormat(name + "-%s").build(),
+                new ThreadPoolExecutor.AbortPolicy());
+    }
+}
