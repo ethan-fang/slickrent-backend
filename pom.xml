@@ -22,8 +22,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <dep.dropwizard.version>0.7.1</dep.dropwizard.version>
-        <!--<dep.jetty.version>9.2.5.v20141112</dep.jetty.version>-->
-
         <dep.jetty.version>9.0.7.v20131107</dep.jetty.version>
     </properties>
 
