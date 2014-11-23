@@ -1,10 +1,10 @@
+package com.xinflood.dao;
+
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.google.common.io.ByteStreams;
-import dao.ImageDao;
-import dao.S3ImageDao;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package domainobject;
+package com.xinflood.domainobject;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

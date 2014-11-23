@@ -1,3 +1,5 @@
+package com.xinflood;
+
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,11 +10,15 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sun.jersey.multipart.impl.MultiPartConfigProvider;
-import dao.S3ImageDao;
+import com.xinflood.dao.PostgresShareItemDao;
+import com.xinflood.dao.S3ImageDao;
+import com.xinflood.dao.ShareItemDao;
 import io.dropwizard.Application;
+import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.lifecycle.ExecutorServiceManager;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.skife.jdbi.v2.DBI;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -36,7 +42,7 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
     @Override
     public void run(ShareItemServerConfiguration config, Environment environment) throws Exception {
 
-        ObjectMapper objectMapper = environment.getObjectMapper();
+        final ObjectMapper objectMapper = environment.getObjectMapper();
         objectMapper.registerModule(new JodaModule());
         objectMapper.configure(SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS, false);
         objectMapper.setDateFormat(new ISO8601DateFormat());
@@ -45,8 +51,14 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
         final AmazonS3Client s3Client = new AmazonS3Client(
                 new BasicAWSCredentials(config.getAwsAccessKeyId(), config.getAwsSecretAccesskey()));
 
+
+
+        final DBIFactory factory = new DBIFactory();
+        final DBI dbi = factory.build(environment, config.getDatabase(), "proximity");
+
+        final ShareItemDao shareItemDao = new PostgresShareItemDao(dbi);
         final ShareItemController shareItemController = new ShareItemController(
-                config, new S3ImageDao(s3Client, config.getS3BucketName()),
+                config, new S3ImageDao(s3Client, config.getS3BucketName()), shareItemDao,
                 getManagedListeningExecutorService(environment, 100, "item process pool")
         );
 

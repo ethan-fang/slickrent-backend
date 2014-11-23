@@ -1,0 +1,2 @@
+curl -XGET localhost:8080/shareitem/?size=2 -v
+curl -XPUT -H "Content-Type: multipart/form-data" --form 'metadata={"itemName":"a", "itemDescription":"descrip", "rentalPeriodStart":"2014-11-22T06:32:17Z", "rentalPeriodEnd": "2014-11-22T06:32:17Z"}'  --form "file=@/Users/xinxinwang/Desktop/img1.png" localhost:8080/shareitem -v

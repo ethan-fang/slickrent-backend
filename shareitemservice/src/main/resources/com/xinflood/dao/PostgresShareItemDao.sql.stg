@@ -1,0 +1,12 @@
+group sql;
+
+add_item() ::= <<
+INSERT INTO shareitemschema.item (id, item_name, item_description, rental_start, rental_end, image_uuids)
+VALUES (:id, :item_name, :item_description, :rental_start, :rental_end, :image_uuids)
+>>
+
+retrieve_items(num_items) ::= <<
+SELECT *
+FROM shareitemschema.item
+<if(num_items)> LIMIT num_items <endif>
+>>

@@ -5,3 +5,18 @@ server:
 
 awsAccessKeyId: AKIAJQVHRQNBFIDYDTWA
 awsSecretAccesskey: 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
+
+
+database:
+  driverClass: org.postgresql.Driver
+  user: xin041619
+  password: xin083333
+  url: jdbc:postgresql://itemsharedbinstance.cujcjpmqj3ya.us-east-1.rds.amazonaws.com:5432/itemsharedb?prepareThreshold=0
+  validationQuery: "/* Mobile Push Service Database Health Check */ SELECT 1"
+  maxSize: 10 # Mimmick prod under strain
+  checkConnectionWhileIdle: true
+  maxConnectionAge: 1m
+  evictionInterval: 5s
+  minIdleTime: 5s
+  properties:
+    logUnclosedConnections: true

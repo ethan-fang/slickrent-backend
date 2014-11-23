@@ -1,3 +1,5 @@
+package com.xinflood;
+
 import com.codahale.metrics.health.HealthCheck;
 
 /**

@@ -1,4 +1,4 @@
-package domainobject;
+package com.xinflood.domainobject;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,21 +18,21 @@ public class Item {
     private final String itemName;
     private final String itemDescription;
     private final Range<DateTime> rentalPeriod;
-    private final ImmutableList<UUID> imageIds;
+    private final ImmutableList<UUID> imageUuids;
 
     @JsonCreator
     public Item(@JsonProperty("id") UUID id,
                 @JsonProperty("itemName") String itemName,
                 @JsonProperty("itemDescription") String itemDescription,
                 @JsonProperty("rentalPeriod") Range<DateTime> rentalPeriod,
-                @JsonProperty("imageIds") List<UUID> imageIds
+                @JsonProperty("imageUuids") List<UUID> imageUuids
 
     ) {
         this.id = id;
         this.itemName = itemName;
         this.itemDescription = itemDescription;
         this.rentalPeriod = rentalPeriod;
-        this.imageIds = ImmutableList.copyOf(imageIds);
+        this.imageUuids = ImmutableList.copyOf(imageUuids);
     }
 
     @JsonProperty
@@ -56,8 +56,8 @@ public class Item {
     }
 
     @JsonProperty
-    public ImmutableList<UUID> getImageIds() {
-        return imageIds;
+    public ImmutableList<UUID> getImageUuids() {
+        return imageUuids;
     }
 
 
@@ -68,7 +68,7 @@ public class Item {
                 .add("itemName", itemName)
                 .add("itemDescription", itemDescription)
                 .add("rentalPeriod", rentalPeriod)
-                .add("imageIds", imageIds)
+                .add("imageUuids", imageUuids)
                 .toString();
     }
 

@@ -1,4 +1,4 @@
-package dao;
+package com.xinflood.dao;
 
 import com.amazonaws.services.s3.model.PutObjectResult;
 
