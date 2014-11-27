@@ -61,12 +61,12 @@ public class PostgresShareItemDao implements ShareItemDao {
     @Override
     public List<Item> getItems(int numItems) {
         Handle handle = dbi.open();
+
         Query<Map<String, Object>> query = handle.createQuery("retrieve_items");
+        if(numItems >=0) {
+            query.bind("size", numItems).define("size", numItems);
 
-        if(numItems > 0) {
-            query.bind("num_items", numItems);
         }
-
         return query.map(new ItemResultMapper()).list();
     }
 

@@ -5,8 +5,8 @@ INSERT INTO shareitemschema.item (id, item_name, item_description, rental_start,
 VALUES (:id, :item_name, :item_description, :rental_start, :rental_end, :image_uuids)
 >>
 
-retrieve_items(num_items) ::= <<
+retrieve_items(size) ::= <<
 SELECT *
 FROM shareitemschema.item
-<if(num_items)> LIMIT num_items <endif>
+<if(size)> LIMIT :size<endif>
 >>
