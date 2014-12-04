@@ -1,0 +1,18 @@
+group sql;
+
+add_user() ::= <<
+INSERT INTO shareitemschema.user (id, username, password, access_token)
+VALUES (:id, :username, :password, :access_token)
+>>
+
+get_token_by_user_id() ::= <<
+SELECT access_token
+FROM shareitemschema.user
+WHERE id=:id
+>>
+
+get_user_by_username() ::= <<
+SELECT *
+FROM shareitemschema.user
+WHERE username=:username
+>>

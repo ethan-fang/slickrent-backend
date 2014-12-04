@@ -10,9 +10,13 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sun.jersey.multipart.impl.MultiPartConfigProvider;
+import com.xinflood.config.ShareItemServerConfiguration;
 import com.xinflood.dao.PostgresShareItemDao;
+import com.xinflood.dao.PostgresUserDao;
 import com.xinflood.dao.S3ImageDao;
 import com.xinflood.dao.ShareItemDao;
+import com.xinflood.resource.AuthResource;
+import com.xinflood.resource.ShareItemResource;
 import io.dropwizard.Application;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.lifecycle.ExecutorServiceManager;
@@ -35,8 +39,7 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
     }
 
     @Override
-    public void initialize(Bootstrap<ShareItemServerConfiguration> imageServerConfigurationBootstrap) {
-
+    public void initialize(Bootstrap<ShareItemServerConfiguration> bootstrap) {
     }
 
     @Override
@@ -64,7 +67,15 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
 
         final ShareItemResource shareItemResource = new ShareItemResource(shareItemController, environment.getObjectMapper());
 
+
+        final PostgresUserDao userDao = new PostgresUserDao(dbi);
+        final AuthResource authResource = new AuthResource(config.getAuthConfiguration().getAllowedGrantTypes(), userDao);
+
+
+
         environment.jersey().register(shareItemResource);
+        environment.jersey().register(authResource);
+
         environment.jersey().register(MultiPartConfigProvider.class);
         environment.jersey().register(com.sun.jersey.multipart.impl.MultiPartReaderServerSide.class);
 

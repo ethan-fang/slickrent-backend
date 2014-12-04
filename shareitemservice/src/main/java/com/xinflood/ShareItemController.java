@@ -2,6 +2,7 @@ package com.xinflood;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
+import com.xinflood.config.ShareItemServerConfiguration;
 import com.xinflood.dao.ImageDao;
 import com.xinflood.dao.ShareItemDao;
 import com.xinflood.domainobject.Item;

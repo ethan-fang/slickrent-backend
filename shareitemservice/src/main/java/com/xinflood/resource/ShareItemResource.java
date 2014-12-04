@@ -1,4 +1,4 @@
-package com.xinflood;
+package com.xinflood.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
@@ -6,6 +6,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
+import com.xinflood.ShareItemController;
 import com.xinflood.domainobject.Item;
 import com.xinflood.domainobject.RequestItemMetadata;
 

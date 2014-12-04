@@ -1,4 +1,4 @@
-package com.xinflood;
+package com.xinflood.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
@@ -10,11 +10,13 @@ import javax.validation.constraints.NotNull;
 /**
  * Created by xinxinwang on 11/16/14.
  */
-public class ShareItemServerConfiguration extends Configuration {
+public class ShareItemServerConfiguration extends Configuration implements WithAuthConfiguration {
 
     private String s3BucketName = "xinxin-share-images";
     private String awsAccessKeyId="";
     private String awsSecretAccesskey="";
+
+    private AuthConfiguration authConfiguration = new AuthConfiguration();
 
 
     @Valid
@@ -54,5 +56,10 @@ public class ShareItemServerConfiguration extends Configuration {
 
     public void setAwsSecretAccesskey(String awsSecretAccesskey) {
         this.awsSecretAccesskey = awsSecretAccesskey;
+    }
+
+    @Override
+    public AuthConfiguration getAuthConfiguration() {
+        return authConfiguration;
     }
 }
