@@ -7,4 +7,6 @@ import com.xinflood.domainobject.User;
  */
 public interface UserDao {
     Optional<User> createNewUser(String username, String password);
+
+    Optional<User> findUserByUsernameAndPassword(String username, String password);
 }

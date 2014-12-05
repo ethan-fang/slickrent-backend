@@ -1,5 +1,16 @@
 group sql;
 
+add_item() ::= <<
+INSERT INTO shareitemschema.item (id, item_name, item_description, rental_start, rental_end, image_uuids)
+VALUES (:id, :item_name, :item_description, :rental_start, :rental_end, :image_uuids)
+>>
+
+retrieve_items(size) ::= <<
+SELECT *
+FROM shareitemschema.item
+<if(size)> LIMIT :size<endif>
+>>
+
 add_user() ::= <<
 INSERT INTO shareitemschema.user (id, username, password, access_token)
 VALUES (:id, :username, :password, :access_token)

@@ -2,7 +2,7 @@ package com.xinflood;
 
 import com.google.common.base.Splitter;
 import com.google.common.io.CharStreams;
-import com.xinflood.dao.PostgresShareItemDao;
+import com.xinflood.dao.PostgresDao;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.tweak.HandleCallback;
@@ -19,9 +19,9 @@ public final class DaoHelper {
         new AssertionError("Don't instantiate this");
     }
 
-    public static PostgresShareItemDao getPostgresShareItemDao() {
+    public static PostgresDao getPostgresShareItemDao() {
         DBI dbi = new DBI("jdbc:postgresql://itemsharedbinstance.cujcjpmqj3ya.us-east-1.rds.amazonaws.com:5432/itemsharedb?prepareThreshold=0", "xin041619", "xin083333");
-        return new PostgresShareItemDao(dbi);
+        return new PostgresDao(dbi);
     }
 
     private static void loadSqlResource(final DBI dbi, final String sqlFile)

@@ -11,10 +11,8 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sun.jersey.multipart.impl.MultiPartConfigProvider;
 import com.xinflood.config.ShareItemServerConfiguration;
-import com.xinflood.dao.PostgresShareItemDao;
-import com.xinflood.dao.PostgresUserDao;
+import com.xinflood.dao.PostgresDao;
 import com.xinflood.dao.S3ImageDao;
-import com.xinflood.dao.ShareItemDao;
 import com.xinflood.resource.AuthResource;
 import com.xinflood.resource.ShareItemResource;
 import io.dropwizard.Application;
@@ -55,22 +53,16 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
                 new BasicAWSCredentials(config.getAwsAccessKeyId(), config.getAwsSecretAccesskey()));
 
 
-
         final DBIFactory factory = new DBIFactory();
         final DBI dbi = factory.build(environment, config.getDatabase(), "proximity");
 
-        final ShareItemDao shareItemDao = new PostgresShareItemDao(dbi);
+        final PostgresDao postgresDao = new PostgresDao(dbi);
         final ShareItemController shareItemController = new ShareItemController(
-                config, new S3ImageDao(s3Client, config.getS3BucketName()), shareItemDao,
+                config, new S3ImageDao(s3Client, config.getS3BucketName()), postgresDao,
                 getManagedListeningExecutorService(environment, 100, "item process pool")
         );
-
         final ShareItemResource shareItemResource = new ShareItemResource(shareItemController, environment.getObjectMapper());
-
-
-        final PostgresUserDao userDao = new PostgresUserDao(dbi);
-        final AuthResource authResource = new AuthResource(config.getAuthConfiguration().getAllowedGrantTypes(), userDao);
-
+        final AuthResource authResource = new AuthResource(config.getAuthConfiguration().getAllowedGrantTypes(), postgresDao);
 
 
         environment.jersey().register(shareItemResource);

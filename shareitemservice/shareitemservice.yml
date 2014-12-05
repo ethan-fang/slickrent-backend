@@ -3,6 +3,22 @@ server:
   maxThreads: 1024
 
 
+logging:
+  level: INFO
+  appenders:
+    - type: console
+      threshold: ALL
+      timeZone: UTC
+      target: stdout
+    - type: file
+      currentLogFilename: /var/log/myapplication.log
+      threshold: ALL
+      archive: true
+      archivedLogFilenamePattern: /var/log/myapplication-%d.log
+      archivedFileCount: 5
+      timeZone: UTC
+
+
 awsAccessKeyId: AKIAJQVHRQNBFIDYDTWA
 awsSecretAccesskey: 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
 

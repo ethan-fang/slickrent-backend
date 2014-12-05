@@ -16,6 +16,9 @@ import java.util.UUID;
  * Created by xinxinwang on 11/23/14.
  */
 public class ItemResultMapper implements ResultSetMapper<Item> {
+
+    public static final ItemResultMapper INSTANCE = new ItemResultMapper();
+
     @Override
     public Item map(int index, ResultSet r, StatementContext ctx) throws SQLException {
 

@@ -5,7 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.sun.jersey.api.Responses;
-import com.xinflood.dao.PostgresUserDao;
+import com.xinflood.dao.UserDao;
 import com.xinflood.domainobject.User;
 
 import javax.ws.rs.Consumes;
@@ -21,9 +21,9 @@ import java.util.List;
 @Path("/user")
 public class AuthResource {
 	private ImmutableList<String> allowedGrantTypes;
-	private PostgresUserDao userDao;
+	private UserDao userDao;
 
-	public AuthResource(List<String> allowedGrantTypes, PostgresUserDao userDao) {
+	public AuthResource(List<String> allowedGrantTypes, UserDao userDao) {
 		this.allowedGrantTypes = ImmutableList.copyOf(allowedGrantTypes);
 		this.userDao = userDao;
 

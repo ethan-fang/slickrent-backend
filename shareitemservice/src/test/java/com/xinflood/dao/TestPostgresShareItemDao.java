@@ -14,7 +14,7 @@ import java.util.UUID;
  */
 public class TestPostgresShareItemDao {
 
-    private PostgresShareItemDao postgresShareItemDao = DaoHelper.getPostgresShareItemDao();
+    private PostgresDao postgresDao = DaoHelper.getPostgresShareItemDao();
 
     @Test
     public void testInsertShareItem() {
@@ -24,6 +24,6 @@ public class TestPostgresShareItemDao {
                 ImmutableList.of(UUID.randomUUID())
         );
 
-        postgresShareItemDao.addShareItem(item);
+        postgresDao.addShareItem(item);
     }
 }
