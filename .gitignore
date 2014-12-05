@@ -5,3 +5,7 @@
 # mvn
 target
 
+
+# important config to exclude from tracking
+*.yml
+
