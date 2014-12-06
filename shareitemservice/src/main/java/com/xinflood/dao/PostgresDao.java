@@ -39,7 +39,7 @@ public class PostgresDao implements ShareItemDao, UserDao {
 
 
     @Override
-    public void addShareItem(Item item) {
+    public void addShareItem(Item item, UUID userId) {
         Handle handle = dbi.open();
         Update update = handle.createStatement("add_item");
         update.bind("id", item.getId());
@@ -48,6 +48,7 @@ public class PostgresDao implements ShareItemDao, UserDao {
         update.bind("rental_start", item.getRentalPeriod().lowerEndpoint());
         update.bind("rental_end", item.getRentalPeriod().upperEndpoint());
         update.bind("image_uuids", SqlArray.arrayOf(UUID.class, item.getImageUuids()));
+        update.bind("user_id", userId);
 
 
         int rowsModified = update.execute();
@@ -62,21 +63,26 @@ public class PostgresDao implements ShareItemDao, UserDao {
     }
 
     @Override
-    public List<Item> getItems(int numItems) {
+    public List<Item> getItems(int numItems, Optional<UUID> userId) {
         Handle handle = dbi.open();
 
         Query<Map<String, Object>> query = handle.createQuery("retrieve_items");
         if(numItems >=0) {
-            query.bind("size", numItems).define("size", numItems);
+//            query.bind("size", numItems).define("size", numItems);
+            query.define("size", numItems);
+        }
 
+        if(userId.isPresent()) {
+            query.bind("userId", userId.get()).define("userId", userId.get());
         }
         return query.map(ItemResultMapper.INSTANCE).list();
     }
 
 
+    @Override
     public Optional<User> findUserByUsernameAndPassword(final String username, final String password) {
         Handle handle = dbi.open();
-        List<User> queryResult = handle.createQuery("get_user_by_username").bind("username", username).map(new UserMapper()).list();
+        List<User> queryResult = handle.createQuery("get_user_by_username").bind("username", username).map(UserMapper.INSTANCE).list();
 
         Optional<User> user;
         if(queryResult.size() == 0) {
@@ -117,6 +123,15 @@ public class PostgresDao implements ShareItemDao, UserDao {
 
         handle.close();
         return Optional.of(new User(userId, username, password, accessToken));
+    }
+
+    @Override
+    public Optional<User> findUserByToken(String token) {
+        Handle handle = dbi.open();
+        User user = handle.createQuery("get_user_by_token").bind("access_token", token).map(UserMapper.INSTANCE).first();
+        handle.close();
+
+        return Optional.of(user);
     }
 
     private String createNewAccessToken(String username) {

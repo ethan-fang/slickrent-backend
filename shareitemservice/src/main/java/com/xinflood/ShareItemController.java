@@ -1,5 +1,6 @@
 package com.xinflood;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
 import com.xinflood.config.ShareItemServerConfiguration;
@@ -36,15 +37,15 @@ public class ShareItemController {
         this.executorService = executorService;
     }
 
-    public Item addNewItem(RequestItemMetadata requestItemMetadata, Collection<InputStream> imageUploads) throws IOException {
+    public Item addNewItem(UUID userId, RequestItemMetadata requestItemMetadata, Collection<InputStream> imageUploads) throws IOException {
         Item item = Item.of(requestItemMetadata, uploadImages(imageUploads));
-        executorService.submit(new AddItemTask(item, shareItemDao));
+        executorService.submit(new AddItemTask(item, shareItemDao, userId));
         return item;
     }
 
 
-    public List<Item> getItems(int numItems) throws ExecutionException, InterruptedException {
-        Future<List<Item>> future = executorService.submit(new GetItemsTask(shareItemDao, numItems));
+    public List<Item> getItems(int numItems, Optional<UUID> userId) throws ExecutionException, InterruptedException {
+        Future<List<Item>> future = executorService.submit(new GetItemsTask(shareItemDao, numItems, userId));
         return future.get();
     }
 
@@ -64,15 +65,17 @@ public class ShareItemController {
 
         private final ShareItemDao shareItemDao;
         private final int numItems;
+        private final Optional<UUID> userId;
 
-        private GetItemsTask(ShareItemDao shareItemDao, int numItems) {
+        private GetItemsTask(ShareItemDao shareItemDao, int numItems, Optional<UUID> userId) {
             this.shareItemDao = shareItemDao;
             this.numItems = numItems;
+            this.userId = userId;
         }
 
         @Override
         public List<Item> call() throws Exception {
-            return shareItemDao.getItems(numItems);
+            return shareItemDao.getItems(numItems, userId);
         }
     }
 
@@ -80,16 +83,18 @@ public class ShareItemController {
 
         private final Item item;
         private final ShareItemDao shareItemDao;
+        private final UUID userId;
 
-        private AddItemTask(Item item, ShareItemDao shareItemDao) {
+        private AddItemTask(Item item, ShareItemDao shareItemDao, UUID userId) {
             this.item = item;
             this.shareItemDao = shareItemDao;
+            this.userId = userId;
         }
 
 
         @Override
         public Boolean call() throws Exception {
-            shareItemDao.addShareItem(item);
+            shareItemDao.addShareItem(item, userId);
             return true;
         }
     }

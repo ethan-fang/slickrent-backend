@@ -12,6 +12,10 @@ import java.util.UUID;
  * Created by xinxinwang on 12/3/14.
  */
 public class UserMapper implements ResultSetMapper<User> {
+
+    public static final UserMapper INSTANCE = new UserMapper();
+
+
     @Override
     public User map(int index, ResultSet r, StatementContext ctx) throws SQLException {
         UUID id = UUID.fromString(r.getString("id"));

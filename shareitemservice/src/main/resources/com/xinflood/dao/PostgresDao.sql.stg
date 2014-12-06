@@ -5,10 +5,11 @@ INSERT INTO shareitemschema.item (id, item_name, item_description, rental_start,
 VALUES (:id, :item_name, :item_description, :rental_start, :rental_end, :image_uuids)
 >>
 
-retrieve_items(size) ::= <<
+retrieve_items(size, userId) ::= <<
 SELECT *
 FROM shareitemschema.item
-<if(size)> LIMIT :size<endif>
+<if(userId)> where id = :userId<endif>
+<if(size)> LIMIT <size><endif>
 >>
 
 add_user() ::= <<
@@ -26,4 +27,10 @@ get_user_by_username() ::= <<
 SELECT *
 FROM shareitemschema.user
 WHERE username=:username
+>>
+
+get_user_by_token() ::= <<
+SELECT *
+FROM shareitemschema.user
+WHERE access_token=:access_token
 >>

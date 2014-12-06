@@ -10,12 +10,14 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sun.jersey.multipart.impl.MultiPartConfigProvider;
+import com.xinflood.auth.BearerTokenOAuth2Provider;
 import com.xinflood.config.ShareItemServerConfiguration;
 import com.xinflood.dao.PostgresDao;
 import com.xinflood.dao.S3ImageDao;
 import com.xinflood.resource.AuthResource;
 import com.xinflood.resource.ShareItemResource;
 import io.dropwizard.Application;
+import io.dropwizard.auth.oauth.OAuthProvider;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.lifecycle.ExecutorServiceManager;
 import io.dropwizard.setup.Bootstrap;
@@ -70,6 +72,9 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
 
         environment.jersey().register(MultiPartConfigProvider.class);
         environment.jersey().register(com.sun.jersey.multipart.impl.MultiPartReaderServerSide.class);
+
+        BearerTokenOAuth2Provider oAuth2Provider = new BearerTokenOAuth2Provider(postgresDao);
+        environment.jersey().register(new OAuthProvider<>(oAuth2Provider, "app_realm"));
 
         environment.healthChecks().register("heartbeat", new HeartbeatHealthCheck());
 
