@@ -11,6 +11,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sun.jersey.multipart.impl.MultiPartConfigProvider;
 import com.xinflood.auth.BearerTokenOAuth2Provider;
+import com.xinflood.bundle.SwaggerBundle;
 import com.xinflood.config.ShareItemServerConfiguration;
 import com.xinflood.dao.PostgresDao;
 import com.xinflood.dao.S3ImageDao;
@@ -40,6 +41,7 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
 
     @Override
     public void initialize(Bootstrap<ShareItemServerConfiguration> bootstrap) {
+        bootstrap.addBundle(new SwaggerBundle());
     }
 
     @Override

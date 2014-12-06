@@ -7,6 +7,8 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import com.xinflood.ShareItemController;
 import com.xinflood.domainobject.Item;
 import com.xinflood.domainobject.RequestItemMetadata;
@@ -36,6 +38,7 @@ import static com.google.common.base.Preconditions.checkState;
 /**
  * Created by xinxinwang on 11/16/14.
  */
+@Api(value = "/shareitem", description = "share a new item")
 @Path("/shareitem")
 public class ShareItemResource {
 
@@ -51,6 +54,7 @@ public class ShareItemResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{userId}")
+    @ApiOperation(value = "add a new item under a given user", response = String.class)
     public Response addItem(@Auth User user, @PathParam("userId") UUID userId,
             FormDataMultiPart formDataMultiPart
     ) throws IOException {
@@ -76,6 +80,7 @@ public class ShareItemResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "get items for an optional user", response = String.class)
     public Response getItems(@QueryParam("size") @DefaultValue("10") int size, @QueryParam("userId") Optional<UUID> userId) throws ExecutionException, InterruptedException {
         List<Item> items = shareItemController.getItems(size, userId);
         return Response.ok(ImmutableMap.of("items", items)).build();
