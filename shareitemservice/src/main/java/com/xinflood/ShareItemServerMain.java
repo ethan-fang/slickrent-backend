@@ -11,6 +11,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sun.jersey.multipart.impl.MultiPartConfigProvider;
 import com.xinflood.auth.BearerTokenOAuth2Provider;
+import com.xinflood.auth.ClientIdFilter;
 import com.xinflood.bundle.SwaggerBundle;
 import com.xinflood.config.ShareItemServerConfiguration;
 import com.xinflood.dao.PostgresDao;
@@ -25,6 +26,8 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.skife.jdbi.v2.DBI;
 
+import javax.servlet.DispatcherType;
+import java.util.EnumSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -76,7 +79,11 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
         environment.jersey().register(com.sun.jersey.multipart.impl.MultiPartReaderServerSide.class);
 
         BearerTokenOAuth2Provider oAuth2Provider = new BearerTokenOAuth2Provider(postgresDao);
-        environment.jersey().register(new OAuthProvider<>(oAuth2Provider, "app_realm"));
+        environment.jersey().register(new OAuthProvider<>(oAuth2Provider, config.getAuthConfiguration().getBearerRealm()));
+
+        ClientIdFilter clientIdFilter = new ClientIdFilter(config.getAuthConfiguration().getAllowedClientIds());
+
+        environment.servlets().addFilter("clientIdFilter", clientIdFilter).addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
 
         environment.healthChecks().register("heartbeat", new HeartbeatHealthCheck());
 

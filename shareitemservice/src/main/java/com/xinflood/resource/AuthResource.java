@@ -2,7 +2,6 @@ package com.xinflood.resource;
 
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -22,13 +21,10 @@ import java.util.List;
 @Path("/user")
 @Api(value = "/user", description = "user sign in/up")
 public class AuthResource {
-	private ImmutableList<String> allowedGrantTypes;
 	private UserDao userDao;
 
 	public AuthResource(List<String> allowedGrantTypes, UserDao userDao) {
-		this.allowedGrantTypes = ImmutableList.copyOf(allowedGrantTypes);
 		this.userDao = userDao;
-
 	}
 
     @POST
@@ -37,7 +33,7 @@ public class AuthResource {
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "sign in with username and password to retrieve user token", response = String.class)
     public Response postForToken(
-            @FormParam("username") @Required String username,
+            @FormParam("username") String username,
             @FormParam("password") String password
     ) {
         // Try to find a user with the supplied credentials.
