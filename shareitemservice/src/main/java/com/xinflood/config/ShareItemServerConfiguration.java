@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
  */
 public class ShareItemServerConfiguration extends Configuration implements WithAuthConfiguration {
 
-    private String s3BucketName = "xinxin-share-images";
+    private String s3BucketName = "share-images-xinflood";
     private String awsAccessKeyId="";
     private String awsSecretAccesskey="";
 
