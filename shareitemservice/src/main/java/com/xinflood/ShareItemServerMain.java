@@ -71,7 +71,7 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
                 getManagedListeningExecutorService(environment, 100, "item process pool")
         );
         final ShareItemResource shareItemResource = new ShareItemResource(shareItemController, environment.getObjectMapper());
-        final AuthResource authResource = new AuthResource(config.getAuthConfiguration().getAllowedGrantTypes(), postgresDao);
+        final AuthResource authResource = new AuthResource(postgresDao);
 
 
         environment.jersey().register(shareItemResource);
@@ -92,7 +92,6 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
         }
 
         environment.healthChecks().register("heartbeat", new HeartbeatHealthCheck());
-
     }
 
     private ListeningExecutorService getManagedListeningExecutorService(final Environment environment,

@@ -8,16 +8,17 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.xinflood.dao.UserDao;
 import com.xinflood.domainobject.User;
+import com.xinflood.domainobject.UsernamePasswordPair;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.List;
 
 @Path("/user")
 @Api(value = "/user", description = "user sign in/up")
@@ -25,22 +26,24 @@ import java.util.List;
 public class AuthResource {
 	private UserDao userDao;
 
-	public AuthResource(List<String> allowedGrantTypes, UserDao userDao) {
+	public AuthResource(UserDao userDao) {
 		this.userDao = userDao;
 	}
 
-    @POST
+    @GET
     @Path("/signin")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @ApiOperation(value = "sign in with username and password to retrieve user token", response = String.class)
-    public Response postForToken(
-            @ApiParam(value = "username", required = true) @FormParam("username") String username,
-            @ApiParam(value = "password", required = true) @FormParam("password") String password
+    public Response getToken(
+            @ApiParam(value = "username", required = true) @QueryParam("username") String username,
+            @ApiParam(value = "password", required = true) @QueryParam("password") String password
     ) {
-        // Try to find a user with the supplied credentials.
+//        Try to find a user with the supplied credentials.
         Optional<User> user = userDao.findUserByUsernameAndPassword(username, password);
         if (user == null || !user.isPresent()) {
-            throw new WebApplicationException(Response.status(Response.Status.UNAUTHORIZED).build());
+            throw new WebApplicationException(
+                    Response.status(Response.Status.UNAUTHORIZED)
+                            .entity(ImmutableMap.of("error", String.format("user %s not found", username)))
+                            .build());
         }
 
         return Response.ok(ImmutableMap.of("token", user.get().getAccessToken())).build();
@@ -49,11 +52,14 @@ public class AuthResource {
 
     @POST
     @Path("/signup")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "new user sign up", response = String.class)
     public Response userSignUp(
-            @ApiParam(value = "username", required = true) @FormParam("username") String username,
-            @ApiParam(value = "password", required = true) @FormParam("password") String password) {
+            @ApiParam(value = "username and password in json", required = true)
+            UsernamePasswordPair usernamePasswordPair
+    ) {
+        String username = usernamePasswordPair.getUsername();
+        String password = usernamePasswordPair.getPassword();
         Optional<User> user = userDao.createNewUser(username, password);
 
         return Response.ok(ImmutableMap.of("user", user)).build();

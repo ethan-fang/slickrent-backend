@@ -33,6 +33,12 @@ public class ClientIdRequestFilter implements ContainerRequestFilter {
             Matcher matcher = pattern.matcher(request.getPath());
             if(matcher.find()) {
                 String clientId = request.getQueryParameters().getFirst("clientId");
+
+                // a temporary hack to get api_key for swagger
+                if(clientId == null) {
+                    clientId = request.getQueryParameters().getFirst("api_key");
+                }
+
                 Response.ResponseBuilder responseBuilder = Response.status(Response.Status.UNAUTHORIZED)
                         .header("Content-Type", "application/json");
 

@@ -53,10 +53,12 @@ public class ShareItemResource {
     }
 
     @PUT
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.MULTIPART_FORM_DATA})
     @Path("/{userId}")
     @ApiOperation(value = "add a new item under a given user", response = String.class)
-    public Response addItem(@Auth User user, @ApiParam(required = true, value = "user id") @PathParam("userId") UUID userId,
+    public Response addItem(
+            @Auth User user,
+            @ApiParam(required = true, value = "user id") @PathParam("userId") UUID userId,
             FormDataMultiPart formDataMultiPart
     ) throws IOException {
         checkState(user.getId().equals(userId), "unauthorized access for %s", userId);
