@@ -10,12 +10,13 @@ import javax.validation.constraints.NotNull;
 /**
  * Created by xinxinwang on 11/16/14.
  */
-public class ShareItemServerConfiguration extends Configuration implements WithAuthConfiguration {
+public class ShareItemServerConfiguration extends Configuration implements WithClientIdConfiguration, WithAuthConfiguration {
 
     private String s3BucketName = "share-images-xinflood";
     private String awsAccessKeyId="";
     private String awsSecretAccesskey="";
 
+    private ClientIdConfiguration clientIdConfiguration = new ClientIdConfiguration();
     private AuthConfiguration authConfiguration = new AuthConfiguration();
 
 
@@ -56,6 +57,11 @@ public class ShareItemServerConfiguration extends Configuration implements WithA
 
     public void setAwsSecretAccesskey(String awsSecretAccesskey) {
         this.awsSecretAccesskey = awsSecretAccesskey;
+    }
+
+    @Override
+    public ClientIdConfiguration getClientIdConfiguration() {
+        return clientIdConfiguration;
     }
 
     @Override

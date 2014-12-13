@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import com.xinflood.dao.UserDao;
 import com.xinflood.domainobject.User;
 
@@ -20,6 +21,7 @@ import java.util.List;
 
 @Path("/user")
 @Api(value = "/user", description = "user sign in/up")
+@Produces(MediaType.APPLICATION_JSON)
 public class AuthResource {
 	private UserDao userDao;
 
@@ -30,11 +32,10 @@ public class AuthResource {
     @POST
     @Path("/signin")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "sign in with username and password to retrieve user token", response = String.class)
     public Response postForToken(
-            @FormParam("username") String username,
-            @FormParam("password") String password
+            @ApiParam(value = "username", required = true) @FormParam("username") String username,
+            @ApiParam(value = "password", required = true) @FormParam("password") String password
     ) {
         // Try to find a user with the supplied credentials.
         Optional<User> user = userDao.findUserByUsernameAndPassword(username, password);
@@ -49,9 +50,10 @@ public class AuthResource {
     @POST
     @Path("/signup")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "new user sign up", response = String.class)
-    public Response userSignUp(@FormParam("username") String username, @FormParam("password") String password) {
+    public Response userSignUp(
+            @ApiParam(value = "username", required = true) @FormParam("username") String username,
+            @ApiParam(value = "password", required = true) @FormParam("password") String password) {
         Optional<User> user = userDao.createNewUser(username, password);
 
         return Response.ok(ImmutableMap.of("user", user)).build();

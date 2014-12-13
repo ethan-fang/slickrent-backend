@@ -9,6 +9,7 @@ import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import com.xinflood.ShareItemController;
 import com.xinflood.domainobject.Item;
 import com.xinflood.domainobject.RequestItemMetadata;
@@ -40,6 +41,7 @@ import static com.google.common.base.Preconditions.checkState;
  */
 @Api(value = "/shareitem", description = "share a new item")
 @Path("/shareitem")
+@Produces(MediaType.APPLICATION_JSON)
 public class ShareItemResource {
 
     private final ShareItemController shareItemController;
@@ -52,10 +54,9 @@ public class ShareItemResource {
 
     @PUT
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/{userId}")
     @ApiOperation(value = "add a new item under a given user", response = String.class)
-    public Response addItem(@Auth User user, @PathParam("userId") UUID userId,
+    public Response addItem(@Auth User user, @ApiParam(required = true, value = "user id") @PathParam("userId") UUID userId,
             FormDataMultiPart formDataMultiPart
     ) throws IOException {
         checkState(user.getId().equals(userId), "unauthorized access for %s", userId);
@@ -79,10 +80,10 @@ public class ShareItemResource {
 
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @ApiOperation(value = "get items for an optional user", response = String.class)
-    public Response getItems(@QueryParam("size") @DefaultValue("10") int size, @QueryParam("userId") Optional<UUID> userId) throws ExecutionException, InterruptedException {
-        List<Item> items = shareItemController.getItems(size, userId);
+    public Response getItems(@QueryParam("size") @DefaultValue("10") int size, @QueryParam("userId") UUID userId) throws ExecutionException, InterruptedException {
+        List<Item> items = shareItemController.getItems(size, Optional.fromNullable(userId));
         return Response.ok(ImmutableMap.of("items", items)).build();
     }
 }

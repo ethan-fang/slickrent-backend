@@ -11,8 +11,8 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sun.jersey.multipart.impl.MultiPartConfigProvider;
 import com.xinflood.auth.BearerTokenOAuth2Provider;
-import com.xinflood.auth.ClientIdFilter;
-import com.xinflood.bundle.SwaggerBundle;
+import com.xinflood.auth.ClientIdRequestFilter;
+import com.xinflood.config.ClientIdConfiguration;
 import com.xinflood.config.ShareItemServerConfiguration;
 import com.xinflood.dao.PostgresDao;
 import com.xinflood.dao.S3ImageDao;
@@ -24,10 +24,9 @@ import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.lifecycle.ExecutorServiceManager;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import io.federecio.dropwizard.swagger.SwaggerDropwizard;
 import org.skife.jdbi.v2.DBI;
 
-import javax.servlet.DispatcherType;
-import java.util.EnumSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -38,17 +37,20 @@ import java.util.concurrent.TimeUnit;
  */
 public class ShareItemServerMain extends Application<ShareItemServerConfiguration> {
 
+    private final SwaggerDropwizard swaggerDropwizard = new SwaggerDropwizard();
+
     public static void main(String[] args) throws Exception {
         new ShareItemServerMain().run(args);
     }
 
     @Override
     public void initialize(Bootstrap<ShareItemServerConfiguration> bootstrap) {
-        bootstrap.addBundle(new SwaggerBundle());
+        swaggerDropwizard.onInitialize(bootstrap);
     }
 
     @Override
     public void run(ShareItemServerConfiguration config, Environment environment) throws Exception {
+        swaggerDropwizard.onRun(config, environment, "localhost");
 
         final ObjectMapper objectMapper = environment.getObjectMapper();
         objectMapper.registerModule(new JodaModule());
@@ -81,9 +83,13 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
         BearerTokenOAuth2Provider oAuth2Provider = new BearerTokenOAuth2Provider(postgresDao);
         environment.jersey().register(new OAuthProvider<>(oAuth2Provider, config.getAuthConfiguration().getBearerRealm()));
 
-        ClientIdFilter clientIdFilter = new ClientIdFilter(config.getAuthConfiguration().getAllowedClientIds());
 
-        environment.servlets().addFilter("clientIdFilter", clientIdFilter).addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
+        ClientIdConfiguration clientAuth = config.getClientIdConfiguration();
+        if(clientAuth.isEnabled()) {
+            final ClientIdRequestFilter clientIdRequestFilter = new ClientIdRequestFilter(clientAuth.getValidClientIds(),
+                    clientAuth.getfilterPathPatterns());
+            environment.jersey().getResourceConfig().getContainerRequestFilters().add(clientIdRequestFilter);
+        }
 
         environment.healthChecks().register("heartbeat", new HeartbeatHealthCheck());
 

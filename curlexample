@@ -1,4 +1,5 @@
 curl -XGET localhost:8080/shareitem/?size=2 -v
 curl -XPUT -H "Content-Type: multipart/form-data" --form 'metadata={"itemName":"a", "itemDescription":"descrip", "rentalPeriodStart":"2014-11-22T06:32:17Z", "rentalPeriodEnd": "2014-11-22T06:32:17Z"}'  --form "file=@/Users/xinxinwang/Desktop/img1.png" localhost:8080/shareitem -v
 
-curl -XPOST -H "Content-Type: application/x-www-form-urlencoded"  -d grantType=password -d username=alice -d password=secret -d clientId=abc  localhost:8080/oauth2/token -v
+
+curl -XPOST -H "Content-Type: application/x-www-form-urlencoded"  -d grantType=password -d username=xin041619 -d password=xin083333 -d clientId=e7568b2c-2c0f-480e-9e34-08f9a4b807dc  $EC2_DNS:8080/user/signin -v

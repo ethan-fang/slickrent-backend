@@ -1,7 +1,7 @@
 package com.xinflood.config;
 
 /**
- * Created by xinxinwang on 11/27/14.
+ * Created by xinxinwang on 12/13/14.
  */
 public interface WithAuthConfiguration {
     AuthConfiguration getAuthConfiguration();
