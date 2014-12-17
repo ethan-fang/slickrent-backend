@@ -1,6 +1,7 @@
 package com.xinflood.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
@@ -43,7 +44,15 @@ public class AuthConfiguration extends Configuration {
 
     public void setAllowedGrantTypes(ImmutableList<String> allowedGrantTypes) {
         this.allowedGrantTypes = allowedGrantTypes;
+    }
 
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("allowedGrantTypes", allowedGrantTypes)
+                .add("bearerRealm", bearerRealm)
+                .add("database", database)
+                .toString();
     }
 }

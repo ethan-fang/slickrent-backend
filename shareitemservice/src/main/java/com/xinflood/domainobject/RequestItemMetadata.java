@@ -3,7 +3,15 @@ package com.xinflood.domainobject;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Range;
 import org.joda.time.DateTime;
+
+import java.util.List;
+import java.util.UUID;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Created by xinxinwang on 11/16/14.
@@ -11,19 +19,31 @@ import org.joda.time.DateTime;
 public class RequestItemMetadata {
     private final String itemName;
     private final String itemDescription;
-    private final DateTime rentalPeriodStart;
-    private final DateTime rentalPeriodEnd;
+    private final double priceInDollar;
+    private final ImmutableList<UUID> imageUuids;
+    private final int quantity;
+    private final ImmutableList<Range<DateTime>> rentalRanges;
 
     @JsonCreator
     public RequestItemMetadata(@JsonProperty("itemName") String itemName,
                                @JsonProperty("itemDescription") String itemDescription,
-                               @JsonProperty("rentalPeriodStart") DateTime rentalPeriodStart,
-                               @JsonProperty("rentalPeriodEnd") DateTime rentalPeriodEnd) {
-        this.itemName = itemName;
-        this.itemDescription = itemDescription;
-        this.rentalPeriodStart = rentalPeriodStart;
-        this.rentalPeriodEnd = rentalPeriodEnd;
+                               @JsonProperty("price") double priceInDollar,
+                               @JsonProperty("images") List<UUID> imageUuids,
+                               @JsonProperty("quantity") int quantity,
+                               @JsonProperty("rentalPeriods") List<Range<DateTime>> rentalRanges) {
+        this.itemName = checkNotNull(itemName);
+        this.itemDescription = checkNotNull(itemDescription);
+
+        checkArgument(priceInDollar >= 0, "priceInDollar %f should be greater than 0", priceInDollar);
+        this.priceInDollar =  priceInDollar;
+
+        checkArgument(quantity > 0, "quantity %f should be greater than 0", quantity);
+        this.quantity =  quantity;
+
+        this.imageUuids = ImmutableList.copyOf(checkNotNull(imageUuids));
+        this.rentalRanges = ImmutableList.copyOf(checkNotNull(rentalRanges));
     }
+
 
     @JsonProperty
     public String getItemName() {
@@ -36,23 +56,35 @@ public class RequestItemMetadata {
     }
 
     @JsonProperty
-    public DateTime getRentalPeriodStart() {
-        return rentalPeriodStart;
+    public double getPriceInDollar() {
+        return priceInDollar;
     }
 
     @JsonProperty
-    public DateTime getRentalPeriodEnd() {
-        return rentalPeriodEnd;
+    public ImmutableList<UUID> getImageUuids() {
+        return imageUuids;
+    }
+
+    @JsonProperty
+    public int getQuantity() {
+        return quantity;
+    }
+
+    @JsonProperty
+    public ImmutableList<Range<DateTime>> getRentalRanges() {
+        return rentalRanges;
     }
 
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(RequestItemMetadata.class)
+        return MoreObjects.toStringHelper(this)
                 .add("itemName", itemName)
                 .add("itemDescription", itemDescription)
-                .add("rentalPeriodStart", rentalPeriodStart)
-                .add("rentalPeriodEnd", rentalPeriodEnd)
+                .add("priceInDollar", priceInDollar)
+                .add("imageUuids", imageUuids)
+                .add("quantity", quantity)
+                .add("rentalRanges", rentalRanges)
                 .toString();
     }
 }

@@ -1,6 +1,7 @@
 package com.xinflood.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 
 import javax.validation.constraints.NotNull;
@@ -54,5 +55,15 @@ public class ClientIdConfiguration
     {
         this.filterPathPatterns = filterPathPatterns;
         return this;
+    }
+
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("enabled", enabled)
+                .add("validClientIds", validClientIds)
+                .add("filterPathPatterns", filterPathPatterns)
+                .toString();
     }
 }

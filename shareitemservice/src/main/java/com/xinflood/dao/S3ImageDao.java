@@ -3,7 +3,6 @@ package com.xinflood.dao;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.S3Object;
 import com.google.common.io.ByteStreams;
 import com.google.common.net.MediaType;
@@ -24,11 +23,13 @@ public class S3ImageDao implements ImageDao {
     }
 
     @Override
-    public PutObjectResult putImage(String key, byte[] inputStream) throws IOException {
+    public boolean putImage(String key, byte[] inputStream) {
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(MediaType.PNG.toString());
         objectMetadata.setContentLength(inputStream.length);
-        return s3Client.putObject(bucketName, key, new ByteArrayInputStream(inputStream), objectMetadata);
+        s3Client.putObject(bucketName, key, new ByteArrayInputStream(inputStream), objectMetadata);
+
+        return true;
     }
 
     public byte[] getImage(String key) throws IOException {

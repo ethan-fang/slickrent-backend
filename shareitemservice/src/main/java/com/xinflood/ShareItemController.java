@@ -37,8 +37,8 @@ public class ShareItemController {
         this.executorService = executorService;
     }
 
-    public Item addNewItem(UUID userId, RequestItemMetadata requestItemMetadata, Collection<InputStream> imageUploads) throws IOException {
-        Item item = Item.of(requestItemMetadata, uploadImages(imageUploads));
+    public Item addNewItem(UUID userId, RequestItemMetadata requestItemMetadata) throws IOException {
+        Item item = Item.of(requestItemMetadata);
         executorService.submit(new AddItemTask(item, shareItemDao, userId));
         return item;
     }

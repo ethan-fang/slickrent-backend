@@ -1,7 +1,5 @@
 package com.xinflood.dao;
 
-import com.amazonaws.services.s3.model.PutObjectResult;
-
 import java.io.IOException;
 
 /**
@@ -9,6 +7,6 @@ import java.io.IOException;
  */
 public interface ImageDao {
 
-    PutObjectResult putImage(String key, byte[] image) throws IOException;
+    boolean putImage(String key, byte[] image);
     byte[] getImage(String key) throws IOException;
 }

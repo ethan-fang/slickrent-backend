@@ -1,5 +1,11 @@
-curl -XGET localhost:8080/shareitem/?size=2 -v
-curl -XPUT -H "Content-Type: multipart/form-data" --form 'metadata={"itemName":"a", "itemDescription":"descrip", "rentalPeriodStart":"2014-11-22T06:32:17Z", "rentalPeriodEnd": "2014-11-22T06:32:17Z"}'  --form "file=@/Users/xinxinwang/Desktop/img1.png" localhost:8080/shareitem -v
+# auth endpoint
+curl -XPOST -H "Content-Type: application/json" -d '{"username": "share", "password": "share"}'  "localhost:8080/user/signin?clientId=e7568b2c-2c0f-480e-9e34-08f9a4b807dc" -v
+curl -XPOST -H "Content-Type: application/json" -d '{"username": "share", "password": "share"}'  "localhost:8080/user/signup?clientId=e7568b2c-2c0f-480e-9e34-08f9a4b807dc" -v
 
+# image endpoint
+curl -XPOST -F  image=@/Users/xinxinwang/Desktop/img1.png "localhost:8080/image?clientId=e7568b2c-2c0f-480e-9e34-08f9a4b807dc" -v
+curl -XGET localhost:8080/image/7c6a7608-c9b4-4cad-aea9-ba3315d2d879?clientId=e7568b2c-2c0f-480e-9e34-08f9a4b807dc -v
 
-curl -XPOST -H "Content-Type: application/x-www-form-urlencoded"  -d grantType=password -d username=xin041619 -d password=xin083333 -d clientId=e7568b2c-2c0f-480e-9e34-08f9a4b807dc  $EC2_DNS:8080/user/signin -v
+# share item endpoint
+curl -XGET "localhost:8080/shareitem?clientId=e7568b2c-2c0f-480e-9e34-08f9a4b807dc&size=2" -v
+curl -XPOST -H "Authorization: bearer c2hhcmUyMDE0LTEyLTE0VDE3OjU3OjMzLjI5MloxNTE4ODgwMjU1" -H "Content-Type: application/json" -d @./etc/shareitem.example "localhost:8080/shareitem/7ffc2295-6875-4f40-bc65-827b8fd4535b?clientId=e7568b2c-2c0f-480e-9e34-08f9a4b807dc" -v

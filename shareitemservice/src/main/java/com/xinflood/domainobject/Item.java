@@ -72,11 +72,13 @@ public class Item {
                 .toString();
     }
 
-    public static Item of(RequestItemMetadata requestItemMetadata, List<UUID> imageUuids) {
+    public static Item of(RequestItemMetadata requestItemMetadata) {
         return new Item(
-                UUID.randomUUID(), requestItemMetadata.getItemName(),
+                UUID.randomUUID(),
+                requestItemMetadata.getItemName(),
                 requestItemMetadata.getItemDescription(),
-                Range.closed(requestItemMetadata.getRentalPeriodStart(), requestItemMetadata.getRentalPeriodEnd()),
-                imageUuids);
+                requestItemMetadata.getRentalRanges().get(0),
+                requestItemMetadata.getImageUuids());
     }
+
 }

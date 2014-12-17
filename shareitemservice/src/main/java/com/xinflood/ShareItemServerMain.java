@@ -14,9 +14,11 @@ import com.xinflood.auth.BearerTokenOAuth2Provider;
 import com.xinflood.auth.ClientIdRequestFilter;
 import com.xinflood.config.ClientIdConfiguration;
 import com.xinflood.config.ShareItemServerConfiguration;
+import com.xinflood.dao.ImageDao;
 import com.xinflood.dao.PostgresDao;
 import com.xinflood.dao.S3ImageDao;
 import com.xinflood.resource.AuthResource;
+import com.xinflood.resource.ImageResource;
 import com.xinflood.resource.ShareItemResource;
 import io.dropwizard.Application;
 import io.dropwizard.auth.oauth.OAuthProvider;
@@ -26,6 +28,8 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.federecio.dropwizard.swagger.SwaggerDropwizard;
 import org.skife.jdbi.v2.DBI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -37,6 +41,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ShareItemServerMain extends Application<ShareItemServerConfiguration> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShareItemServerMain.class);
     private final SwaggerDropwizard swaggerDropwizard = new SwaggerDropwizard();
 
     public static void main(String[] args) throws Exception {
@@ -50,7 +55,9 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
 
     @Override
     public void run(ShareItemServerConfiguration config, Environment environment) throws Exception {
-        swaggerDropwizard.onRun(config, environment, "localhost");
+        LOGGER.info(config.toString());
+
+        swaggerDropwizard.onRun(config, environment, config.getHostBaseUri().toString());
 
         final ObjectMapper objectMapper = environment.getObjectMapper();
         objectMapper.registerModule(new JodaModule());
@@ -65,17 +72,20 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
         final DBIFactory factory = new DBIFactory();
         final DBI dbi = factory.build(environment, config.getDatabase(), "proximity");
 
+        final ImageDao imageDao = new S3ImageDao(s3Client, config.getS3BucketName());
         final PostgresDao postgresDao = new PostgresDao(dbi);
         final ShareItemController shareItemController = new ShareItemController(
-                config, new S3ImageDao(s3Client, config.getS3BucketName()), postgresDao,
+                config, imageDao, postgresDao,
                 getManagedListeningExecutorService(environment, 100, "item process pool")
         );
         final ShareItemResource shareItemResource = new ShareItemResource(shareItemController, environment.getObjectMapper());
         final AuthResource authResource = new AuthResource(postgresDao);
+        final ImageResource imageResource = new ImageResource(imageDao);
 
 
         environment.jersey().register(shareItemResource);
         environment.jersey().register(authResource);
+        environment.jersey().register(imageResource);
 
         environment.jersey().register(MultiPartConfigProvider.class);
         environment.jersey().register(com.sun.jersey.multipart.impl.MultiPartReaderServerSide.class);

@@ -1,0 +1,15 @@
+{
+  "itemName": "some item",
+  "itemDescription": "an awesome product",
+  "price": 100,
+  "images": ["5b744035-55cc-4ba2-9ebc-07dc794de168"],
+  "quantity": 1,
+  "rentalPeriods": [
+    {
+      "lowerBoundType": "CLOSED",
+      "lowerEndpoint": "2014-01-18T15:15:36.365+02:00",
+      "upperBoundType": "CLOSED",
+      "upperEndpoint": "2014-10-18T20:15:36.365+02:00"
+    }
+  ]
+}

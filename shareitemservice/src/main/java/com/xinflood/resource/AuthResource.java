@@ -11,11 +11,9 @@ import com.xinflood.domainobject.User;
 import com.xinflood.domainobject.UsernamePasswordPair;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -30,23 +28,23 @@ public class AuthResource {
 		this.userDao = userDao;
 	}
 
-    @GET
+    @POST
     @Path("/signin")
     @ApiOperation(value = "sign in with username and password to retrieve user token", response = String.class)
     public Response getToken(
-            @ApiParam(value = "username", required = true) @QueryParam("username") String username,
-            @ApiParam(value = "password", required = true) @QueryParam("password") String password
+            @ApiParam(value = "username and password in json", required = true)
+            UsernamePasswordPair usernamePasswordPair
     ) {
-//        Try to find a user with the supplied credentials.
-        Optional<User> user = userDao.findUserByUsernameAndPassword(username, password);
+        // Try to find a user with the supplied credentials.
+        Optional<User> user = userDao.findUserByUsernameAndPassword(usernamePasswordPair.getUsername(), usernamePasswordPair.getPassword());
         if (user == null || !user.isPresent()) {
             throw new WebApplicationException(
                     Response.status(Response.Status.UNAUTHORIZED)
-                            .entity(ImmutableMap.of("error", String.format("user %s not found", username)))
+                            .entity(ImmutableMap.of("error", String.format("user %s not found", usernamePasswordPair.getUsername())))
                             .build());
         }
 
-        return Response.ok(ImmutableMap.of("token", user.get().getAccessToken())).build();
+        return Response.ok(ImmutableMap.of("user", user.get())).build();
     }
 
 
@@ -64,7 +62,4 @@ public class AuthResource {
 
         return Response.ok(ImmutableMap.of("user", user)).build();
     }
-
-
-
 }

@@ -1,11 +1,13 @@
 package com.xinflood.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.net.URI;
 
 /**
  * Created by xinxinwang on 11/16/14.
@@ -15,6 +17,7 @@ public class ShareItemServerConfiguration extends Configuration implements WithC
     private String s3BucketName = "share-images-xinflood";
     private String awsAccessKeyId="";
     private String awsSecretAccesskey="";
+    private URI hostBaseUri = URI.create("ec2-54-173-114-114.compute-1.amazonaws.com");
 
     private ClientIdConfiguration clientIdConfiguration = new ClientIdConfiguration();
     private AuthConfiguration authConfiguration = new AuthConfiguration();
@@ -67,5 +70,35 @@ public class ShareItemServerConfiguration extends Configuration implements WithC
     @Override
     public AuthConfiguration getAuthConfiguration() {
         return authConfiguration;
+    }
+
+    public URI getHostBaseUri() {
+        return hostBaseUri;
+    }
+
+    public void setHostBaseUri(URI hostBaseUri) {
+        this.hostBaseUri = hostBaseUri;
+    }
+
+    public void setClientIdConfiguration(ClientIdConfiguration clientIdConfiguration) {
+        this.clientIdConfiguration = clientIdConfiguration;
+    }
+
+    public void setAuthConfiguration(AuthConfiguration authConfiguration) {
+        this.authConfiguration = authConfiguration;
+    }
+
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("s3BucketName", s3BucketName)
+                .add("awsAccessKeyId", awsAccessKeyId)
+                .add("awsSecretAccesskey", awsSecretAccesskey)
+                .add("hostBaseUri", hostBaseUri)
+                .add("clientIdConfiguration", clientIdConfiguration)
+                .add("authConfiguration", authConfiguration)
+                .add("database", database)
+                .toString();
     }
 }
