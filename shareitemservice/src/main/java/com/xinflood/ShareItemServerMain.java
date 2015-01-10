@@ -18,6 +18,7 @@ import com.xinflood.dao.ImageDao;
 import com.xinflood.dao.PostgresDao;
 import com.xinflood.dao.S3ImageDao;
 import com.xinflood.resource.AuthResource;
+import com.xinflood.resource.CategoryResource;
 import com.xinflood.resource.ImageResource;
 import com.xinflood.resource.ShareItemResource;
 import io.dropwizard.Application;
@@ -82,10 +83,12 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
         final AuthResource authResource = new AuthResource(postgresDao);
         final ImageResource imageResource = new ImageResource(imageDao);
 
+        final CategoryResource categoryResource = new CategoryResource("/catalog/car_tool_categories.yml");
 
         environment.jersey().register(shareItemResource);
         environment.jersey().register(authResource);
         environment.jersey().register(imageResource);
+        environment.jersey().register(categoryResource);
 
         environment.jersey().register(MultiPartConfigProvider.class);
         environment.jersey().register(com.sun.jersey.multipart.impl.MultiPartReaderServerSide.class);
