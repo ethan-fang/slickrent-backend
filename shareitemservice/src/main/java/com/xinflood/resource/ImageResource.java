@@ -6,6 +6,8 @@ import com.sun.jersey.multipart.FormDataMultiPart;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.xinflood.dao.ImageDao;
+import com.xinflood.domainobject.User;
+import io.dropwizard.auth.Auth;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -37,7 +39,9 @@ public class ImageResource {
     @POST
     @ApiOperation(value = "upload new images", response = String.class)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response upload(FormDataMultiPart body) throws IOException {
+    public Response upload(
+            @Auth User user,
+            FormDataMultiPart body) throws IOException {
 
         checkNotNull(body.getField("image"));
 
