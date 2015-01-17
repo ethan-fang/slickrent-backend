@@ -6,9 +6,9 @@ import org.joda.time.DateTime;
 import java.util.UUID;
 
 public class AccessToken {
-	private final UUID accessTokenId;
-	private final UUID userId;
-	private final DateTime lastAccessUTC;
+    private final UUID accessTokenId;
+    private final UUID userId;
+    private final DateTime lastAccessUTC;
 
     public AccessToken(UUID accessTokenId, UUID userId, DateTime lastAccessUTC) {
         this.accessTokenId = accessTokenId;

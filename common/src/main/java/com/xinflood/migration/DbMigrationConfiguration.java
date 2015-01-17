@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotNull;
 
+
 /**
  * Created by xinxinwang on 1/17/15.
  */

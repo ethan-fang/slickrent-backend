@@ -5,9 +5,9 @@ import com.google.common.base.MoreObjects;
 import java.util.UUID;
 
 public class User {
-	private final UUID id;
-	private final String username;
-	private final String password;
+    private final UUID id;
+    private final String username;
+    private final String password;
 
     private final String accessToken;
 

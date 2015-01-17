@@ -51,7 +51,7 @@ public class ShareItemResource {
             @Auth User user,
             @ApiParam(required = true, value = "user id") @PathParam("userId") UUID userId,
             RequestItemMetadata requestItemMetadata
-    ) throws IOException {
+    ) throws IOException, ExecutionException, InterruptedException {
         checkState(user.getId().equals(userId), "unauthorized access for %s", userId);
 
         Item created = shareItemController.addNewItem(userId, requestItemMetadata);

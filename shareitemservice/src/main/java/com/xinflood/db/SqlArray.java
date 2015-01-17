@@ -2,23 +2,21 @@ package com.xinflood.db;
 
 import com.google.common.collect.Iterables;
 
-import static java.util.Arrays.asList;
-
 /**
  */
 public class SqlArray<T>
 {
-    private final Object[] elements;
+    private final Iterable<T> elements;
     private final Class<T> type;
 
     public SqlArray(Class<T> type, Iterable<T> elements) {
-        this.elements = Iterables.toArray(elements, Object.class);
+        this.elements = elements;
         this.type = type;
     }
 
-    public static <T> SqlArray<T> arrayOf(Class<T> type, T... elements) {
-        return new SqlArray<T>(type, asList(elements));
-    }
+//    public static <T> SqlArray<T> arrayOf(Class<T> type, T... elements) {
+//        return new SqlArray<T>(type, asList(elements));
+//    }
 
     public static <T> SqlArray<T> arrayOf(Class<T> type, Iterable<T> elements) {
         return new SqlArray<T>(type, elements);
@@ -26,7 +24,7 @@ public class SqlArray<T>
 
     public Object[] getElements()
     {
-        return elements;
+        return Iterables.toArray(elements, Object.class);
     }
 
     public Class<T> getType()
@@ -34,3 +32,4 @@ public class SqlArray<T>
         return type;
     }
 }
+

@@ -2,9 +2,11 @@ package com.xinflood;
 
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -18,6 +20,7 @@ import com.xinflood.dao.ImageDao;
 import com.xinflood.dao.PostgresDao;
 import com.xinflood.dao.S3ImageDao;
 import com.xinflood.migration.DbMigrationBundle;
+import com.xinflood.migration.WithDbMigrationConfiguration;
 import com.xinflood.resource.AuthResource;
 import com.xinflood.resource.CategoryResource;
 import com.xinflood.resource.ImageResource;
@@ -33,6 +36,7 @@ import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -54,7 +58,7 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
         swaggerDropwizard.onInitialize(bootstrap);
 
         // add flyway migration
-        bootstrap.addBundle(new DbMigrationBundle());
+        bootstrap.addBundle(new DbMigrationBundle<WithDbMigrationConfiguration>());
     }
 
     @Override
@@ -86,7 +90,12 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
         final AuthResource authResource = new AuthResource(postgresDao);
         final ImageResource imageResource = new ImageResource(imageDao);
 
-        final CategoryResource categoryResource = new CategoryResource("/catalog/car_tool_categories.yml");
+        final JsonNode categoryHierarchy;
+        try (InputStream is = this.getClass().getResourceAsStream("/catalog/car_tool_categories.yml")) {
+            categoryHierarchy = new ObjectMapper(new YAMLFactory()).readValue(is, JsonNode.class);
+        }
+
+        final CategoryResource categoryResource = new CategoryResource(categoryHierarchy);
 
         environment.jersey().register(shareItemResource);
         environment.jersey().register(authResource);
@@ -127,7 +136,7 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
     private ExecutorService getListeningExecutorService(final int maxPoolSize, final String name)
     {
         return new ThreadPoolExecutor(maxPoolSize, maxPoolSize, 10, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<Runnable>(maxPoolSize),
+                new LinkedBlockingQueue<>(maxPoolSize),
                 new ThreadFactoryBuilder().setDaemon(true).setNameFormat(name + "-%s").build(),
                 new ThreadPoolExecutor.AbortPolicy());
     }

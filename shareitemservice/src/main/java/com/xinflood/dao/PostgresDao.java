@@ -1,5 +1,6 @@
 package com.xinflood.dao;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.io.BaseEncoding;
 import com.xinflood.db.DateTimeArgumentFactory;
@@ -136,6 +137,6 @@ public class PostgresDao implements ShareItemDao, UserDao {
 
     private String createNewAccessToken(String username) {
         String keySource = username + DateTime.now().toString() + ThreadLocalRandom.current().nextInt();
-        return BaseEncoding.base64().encode(keySource.getBytes());
+        return BaseEncoding.base64().encode(keySource.getBytes(Charsets.UTF_8));
     }
 }

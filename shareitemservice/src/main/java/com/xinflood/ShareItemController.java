@@ -2,6 +2,7 @@ package com.xinflood;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.xinflood.config.ShareItemServerConfiguration;
 import com.xinflood.dao.ImageDao;
@@ -37,10 +38,15 @@ public class ShareItemController {
         this.executorService = executorService;
     }
 
-    public Item addNewItem(UUID userId, RequestItemMetadata requestItemMetadata) throws IOException {
+    public Item addNewItem(UUID userId, RequestItemMetadata requestItemMetadata) throws IOException, ExecutionException, InterruptedException {
         Item item = Item.of(requestItemMetadata);
-        executorService.submit(new AddItemTask(item, shareItemDao, userId));
-        return item;
+        Future<Boolean> future = executorService.submit(new AddItemTask(item, shareItemDao, userId));
+        boolean success = future.get();
+        if(success) {
+            return item;
+        } else {
+            throw new IOException();
+        }
     }
 
 
@@ -50,13 +56,20 @@ public class ShareItemController {
     }
 
 
-    private List<UUID> uploadImages(Collection<InputStream> imageUploads) throws IOException {
+    private List<UUID> uploadImages(Collection<InputStream> imageUploads) throws IOException, ExecutionException, InterruptedException {
 
         ImmutableList.Builder<UUID> builder = ImmutableList.builder();
+        List<Future<Boolean>> submitResults = Lists.newLinkedList();
         for(InputStream image: imageUploads) {
             UUID imageUUID = UUID.randomUUID();
             builder.add(imageUUID);
-            executorService.submit(new UploadImageTask(imageDao, ByteStreams.toByteArray(image), imageUUID));
+            submitResults.add(executorService.submit(new UploadImageTask(imageDao, ByteStreams.toByteArray(image), imageUUID)));
+        }
+
+        for(Future<Boolean> f : submitResults) {
+            if(f.get() == false) {
+                throw new IOException();
+            }
         }
         return builder.build();
     }

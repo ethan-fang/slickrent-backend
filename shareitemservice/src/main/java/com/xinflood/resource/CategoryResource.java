@@ -1,8 +1,6 @@
 package com.xinflood.resource;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
@@ -13,6 +11,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Created by xinxinwang on 12/18/14.
  */
@@ -21,16 +21,14 @@ import java.io.IOException;
 @Produces(MediaType.APPLICATION_JSON)
 public class CategoryResource {
 
-    JsonNode categoryHierarchy;
-    public CategoryResource(String categoryFilePath) throws IOException {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        categoryHierarchy = mapper.readValue(this.getClass().getResourceAsStream(categoryFilePath), JsonNode.class);
+    private final JsonNode categoryHierarchy;
+    public CategoryResource(JsonNode categoryHierarchy) throws IOException {
+        this.categoryHierarchy = checkNotNull(categoryHierarchy);
     }
 
     @GET
     @ApiOperation(value = "get all category hierarchies", response = String.class)
     public Response getCategoryHierarchy() {
         return Response.ok(categoryHierarchy).build();
-
     }
 }

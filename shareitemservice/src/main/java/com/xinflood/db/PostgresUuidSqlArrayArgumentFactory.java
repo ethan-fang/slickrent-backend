@@ -33,5 +33,4 @@ public class PostgresUuidSqlArrayArgumentFactory implements ArgumentFactory<SqlA
             }
         };
     }
-
 }

@@ -1,6 +1,5 @@
 import com.google.common.base.Function;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -30,25 +29,22 @@ public class ScraperMain {
         Document doc = Jsoup.connect(url + "/landing/page.jsp?name=loan-a-tool").get();
 
         Iterator<Element> it = doc.select("#row-one .grid-4 h3 a").listIterator();
-        ImmutableList<ToolCategory> toolCategories = ImmutableList.copyOf(Iterators.transform(it, new Function<Element, ToolCategory>() {
-            @Override
-            public ToolCategory apply(Element input) {
-                try {
-                    URL categoryUrl = new URL(url + input.attr("href"));
-                    String categoryName = input.text();
-                    System.out.println(categoryName);
-                    Iterable<Tool> tools = getTools(categoryName, categoryUrl);
+        ImmutableList<ToolCategory> toolCategories = ImmutableList.copyOf(Iterators.transform(it, input -> {
+            try {
+                URL categoryUrl = new URL(url + input.attr("href"));
+                String categoryName = input.text();
+                System.out.println(categoryName);
+                Iterable<Tool> tools = getTools(categoryName, categoryUrl);
 
-                    return new ToolCategory(categoryName, categoryUrl, ImmutableList.copyOf(tools));
+                return new ToolCategory(categoryName, categoryUrl, ImmutableList.copyOf(tools));
 
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                return null;
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+
+            return null;
         }));
 
         System.out.println(toolCategories);
@@ -57,20 +53,17 @@ public class ScraperMain {
     private static Iterable<Tool> getTools(String categoryName, URL toolPageLink) throws IOException {
         Document doc = Jsoup.connect(toolPageLink.toString()).get();
 
-        Iterable<Element> filtered = Iterables.filter(doc.select("#mainContent div.grid-24.clearfix .flush a.prodImg"), new Predicate<Element>() {
-            @Override
-            public boolean apply( Element input) {
+        Iterable<Element> filtered = Iterables.filter(doc.select("#mainContent div.grid-24.clearfix .flush a.prodImg"), input -> {
 
 
-                Elements span = input.select("span");
-                Elements img = input.select("img");
+            Elements span = input.select("span");
+            Elements img = input.select("img");
 
-                try {
-                    return ! (span.isEmpty() || img.isEmpty())
-                            && new URL(img.get(0).attr("src")) !=null;
-                } catch (MalformedURLException e) {
-                    return false;
-                }
+            try {
+                return ! (span.isEmpty() || img.isEmpty())
+                        && new URL(img.get(0).attr("src")) !=null;
+            } catch (MalformedURLException e) {
+                return false;
             }
         });
 

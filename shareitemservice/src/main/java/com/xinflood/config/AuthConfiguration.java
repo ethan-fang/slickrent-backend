@@ -12,14 +12,14 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class AuthConfiguration extends Configuration {
-	@Valid
-	@JsonProperty
-	private ImmutableList<String> allowedGrantTypes = ImmutableList.of("password");
+    @Valid
+    @JsonProperty
+    private ImmutableList<String> allowedGrantTypes = ImmutableList.of("password");
 
-	@Valid
-	@JsonProperty
-	@NotEmpty
-	private String bearerRealm = "share";
+    @Valid
+    @JsonProperty
+    @NotEmpty
+    private String bearerRealm = "share";
 
     @Valid
     @NotNull

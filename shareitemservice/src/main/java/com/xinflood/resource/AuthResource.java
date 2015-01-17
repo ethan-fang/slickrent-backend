@@ -21,11 +21,11 @@ import javax.ws.rs.core.Response;
 @Api(value = "/user", description = "user sign in/up")
 @Produces(MediaType.APPLICATION_JSON)
 public class AuthResource {
-	private UserDao userDao;
+    private UserDao userDao;
 
-	public AuthResource(UserDao userDao) {
-		this.userDao = userDao;
-	}
+    public AuthResource(UserDao userDao) {
+        this.userDao = userDao;
+    }
 
     @POST
     @Path("/signin")
