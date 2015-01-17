@@ -2,6 +2,8 @@ package com.xinflood.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
+import com.xinflood.migration.DbMigrationConfiguration;
+import com.xinflood.migration.WithDbMigrationConfiguration;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
 
@@ -12,7 +14,7 @@ import java.net.URI;
 /**
  * Created by xinxinwang on 11/16/14.
  */
-public class ShareItemServerConfiguration extends Configuration implements WithClientIdConfiguration, WithAuthConfiguration {
+public class ShareItemServerConfiguration extends Configuration implements WithClientIdConfiguration, WithAuthConfiguration, WithDbMigrationConfiguration {
 
     private String s3BucketName = "share-images-xinflood";
     private String awsAccessKeyId="";
@@ -21,6 +23,7 @@ public class ShareItemServerConfiguration extends Configuration implements WithC
 
     private ClientIdConfiguration clientIdConfiguration = new ClientIdConfiguration();
     private AuthConfiguration authConfiguration = new AuthConfiguration();
+    private DbMigrationConfiguration dbMigrationConfiguration = new DbMigrationConfiguration();
 
 
     @Valid
@@ -88,7 +91,6 @@ public class ShareItemServerConfiguration extends Configuration implements WithC
         this.authConfiguration = authConfiguration;
     }
 
-
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -100,5 +102,17 @@ public class ShareItemServerConfiguration extends Configuration implements WithC
                 .add("authConfiguration", authConfiguration)
                 .add("database", database)
                 .toString();
+    }
+
+    @NotNull
+    @Override
+    public DbMigrationConfiguration getDbMigrationConfiguration() {
+        return dbMigrationConfiguration;
+    }
+
+    @JsonProperty
+    public ShareItemServerConfiguration setDbMigrationConfiguration(DbMigrationConfiguration dbMigrationConfiguration) {
+        this.dbMigrationConfiguration = dbMigrationConfiguration;
+        return this;
     }
 }

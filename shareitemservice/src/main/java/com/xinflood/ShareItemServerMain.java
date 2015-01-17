@@ -17,6 +17,7 @@ import com.xinflood.config.ShareItemServerConfiguration;
 import com.xinflood.dao.ImageDao;
 import com.xinflood.dao.PostgresDao;
 import com.xinflood.dao.S3ImageDao;
+import com.xinflood.migration.DbMigrationBundle;
 import com.xinflood.resource.AuthResource;
 import com.xinflood.resource.CategoryResource;
 import com.xinflood.resource.ImageResource;
@@ -38,7 +39,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by xinxinwang on 11/16/14.
  */
 public class ShareItemServerMain extends Application<ShareItemServerConfiguration> {
 
@@ -52,6 +52,9 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
     @Override
     public void initialize(Bootstrap<ShareItemServerConfiguration> bootstrap) {
         swaggerDropwizard.onInitialize(bootstrap);
+
+        // add flyway migration
+        bootstrap.addBundle(new DbMigrationBundle());
     }
 
     @Override

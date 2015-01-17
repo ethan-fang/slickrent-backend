@@ -1,36 +1,36 @@
 group sql;
 
 add_item() ::= <<
-INSERT INTO shareitemschema.item (id, item_name, item_description, rental_start, rental_end, image_uuids)
+INSERT INTO slickrent.item (id, item_name, item_description, rental_start, rental_end, image_uuids)
 VALUES (:id, :item_name, :item_description, :rental_start, :rental_end, :image_uuids)
 >>
 
 retrieve_items(size, userId) ::= <<
 SELECT *
-FROM shareitemschema.item
+FROM slickrent.item
 <if(userId)> where id = :userId<endif>
 <if(size)> LIMIT <size><endif>
 >>
 
 add_user() ::= <<
-INSERT INTO shareitemschema.user (id, username, password, access_token)
+INSERT INTO slickrent.user (id, username, password, access_token)
 VALUES (:id, :username, :password, :access_token)
 >>
 
 get_token_by_user_id() ::= <<
 SELECT access_token
-FROM shareitemschema.user
+FROM slickrent.user
 WHERE id=:id
 >>
 
 get_user_by_username() ::= <<
 SELECT *
-FROM shareitemschema.user
+FROM slickrent.user
 WHERE username=:username
 >>
 
 get_user_by_token() ::= <<
 SELECT *
-FROM shareitemschema.user
+FROM slickrent.user
 WHERE access_token=:access_token
 >>

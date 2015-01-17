@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.basepom</groupId>
         <artifactId>basepom-standard</artifactId>
-        <version>5</version>
+        <version>8</version>
     </parent>
 
     <groupId>com.xinflood</groupId>
@@ -74,6 +74,12 @@
                 <groupId>io.dropwizard</groupId>
                 <artifactId>dropwizard-auth</artifactId>
                 <version>${dep.dropwizard.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.dropwizard.modules</groupId>
+                <artifactId>dropwizard-flyway</artifactId>
+                <version>0.7.0-1</version>
             </dependency>
 
             <dependency>
@@ -195,4 +201,18 @@
         </dependencies>
     </dependencyManagement>
 
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
