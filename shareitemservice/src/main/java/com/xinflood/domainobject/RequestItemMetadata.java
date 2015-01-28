@@ -19,7 +19,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RequestItemMetadata {
     private final String itemName;
     private final String itemDescription;
-    private final double priceInDollar;
+    private final double pricePerHourInDollar;
     private final ImmutableList<UUID> imageUuids;
     private final int quantity;
     private final ImmutableList<Range<DateTime>> rentalRanges;
@@ -27,15 +27,15 @@ public class RequestItemMetadata {
     @JsonCreator
     public RequestItemMetadata(@JsonProperty("itemName") String itemName,
                                @JsonProperty("itemDescription") String itemDescription,
-                               @JsonProperty("price") double priceInDollar,
+                               @JsonProperty("pricePerHour") double pricePerHourInDollar,
                                @JsonProperty("images") List<UUID> imageUuids,
                                @JsonProperty("quantity") int quantity,
                                @JsonProperty("rentalPeriods") List<Range<DateTime>> rentalRanges) {
         this.itemName = checkNotNull(itemName);
         this.itemDescription = checkNotNull(itemDescription);
 
-        checkArgument(priceInDollar >= 0, "priceInDollar %f should be greater than 0", priceInDollar);
-        this.priceInDollar =  priceInDollar;
+        checkArgument(pricePerHourInDollar >= 0, "pricePerHourInDollar %f should be greater than 0", pricePerHourInDollar);
+        this.pricePerHourInDollar =  pricePerHourInDollar;
 
         checkArgument(quantity > 0, "quantity %f should be greater than 0", quantity);
         this.quantity =  quantity;
@@ -56,8 +56,8 @@ public class RequestItemMetadata {
     }
 
     @JsonProperty
-    public double getPriceInDollar() {
-        return priceInDollar;
+    public double getPricePerHourInDollar() {
+        return pricePerHourInDollar;
     }
 
     @JsonProperty
@@ -81,7 +81,7 @@ public class RequestItemMetadata {
         return MoreObjects.toStringHelper(this)
                 .add("itemName", itemName)
                 .add("itemDescription", itemDescription)
-                .add("priceInDollar", priceInDollar)
+                .add("pricePerHourInDollar", pricePerHourInDollar)
                 .add("imageUuids", imageUuids)
                 .add("quantity", quantity)
                 .add("rentalRanges", rentalRanges)

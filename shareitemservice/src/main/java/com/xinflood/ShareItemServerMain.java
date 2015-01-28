@@ -32,11 +32,15 @@ import io.dropwizard.lifecycle.ExecutorServiceManager;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.federecio.dropwizard.swagger.SwaggerDropwizard;
+import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.DispatcherType;
+import javax.servlet.FilterRegistration;
 import java.io.InputStream;
+import java.util.EnumSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -66,6 +70,9 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
         LOGGER.info(config.toString());
 
         swaggerDropwizard.onRun(config, environment, config.getHostBaseUri().toString());
+
+        //allow CORS for localhost access
+        configureCors(environment);
 
         final ObjectMapper objectMapper = environment.getObjectMapper();
         objectMapper.registerModule(new JodaModule());
@@ -139,5 +146,18 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
                 new LinkedBlockingQueue<>(maxPoolSize),
                 new ThreadFactoryBuilder().setDaemon(true).setNameFormat(name + "-%s").build(),
                 new ThreadPoolExecutor.AbortPolicy());
+    }
+
+    private void configureCors(Environment environment) {
+
+        final FilterRegistration.Dynamic filter =
+                environment.servlets().addFilter("CORS", CrossOriginFilter.class);
+
+        filter.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
+        filter.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "GET,PUT,POST,DELETE,OPTIONS");
+        filter.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, "*");
+        filter.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*");
+        filter.setInitParameter("allowedHeaders", "Content-Type,Authorization,X-Requested-With,Content-Length,Accept,Origin");
+        filter.setInitParameter("allowCredentials", "true");
     }
 }

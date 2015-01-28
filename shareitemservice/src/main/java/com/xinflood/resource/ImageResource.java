@@ -1,5 +1,6 @@
 package com.xinflood.resource;
 
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteStreams;
 import com.sun.jersey.multipart.FormDataMultiPart;
@@ -62,8 +63,18 @@ public class ImageResource {
     @Produces({"image/jpeg"})
     @ApiOperation(value = "download image", response = byte[].class)
     public Response getImage(@PathParam("imageId") UUID imageId) throws IOException {
-        byte[] image = imageDao.getImage(imageId.toString());
-        Response response = Response.ok(image).header("Content-Type", "image/jpeg").build();
-        return response;
+        try {
+            byte[] image = imageDao.getImage(imageId.toString());
+            Response response = Response.ok(image).header("Content-Type", "image/jpeg").build();
+            return response;
+        } catch (AmazonS3Exception s3Exception) {
+            Response response = Response.status(s3Exception.getStatusCode())
+                                        .header("Content-Type", "application/json")
+                                        .entity(ImmutableMap.of("error source", "amazon s3",
+                                                                "error message", s3Exception.getErrorMessage()))
+                                        .build();
+            throw new WebApplicationException(response);
+        }
+
     }
 }
