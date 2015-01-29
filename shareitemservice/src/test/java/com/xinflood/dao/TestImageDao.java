@@ -24,7 +24,7 @@ public class TestImageDao {
     @Before
     public void setup() {
         AmazonS3 s3client = new AmazonS3Client(new ProfileCredentialsProvider());
-        imageDao = new S3ImageDao(s3client, "xinxin-share-images");
+        imageDao = new S3ImageDao(s3client, "share-images-xinflood");
     }
 
     @Test
