@@ -34,7 +34,7 @@ public class TestPostgresShareItemDao {
     @Test
     public void testGetShareItem() {
         int numItem = 1;
-        List<Item> i = postgresDao.getItems(numItem, Optional.of(UUID.fromString("036ebde5-369d-4cca-ae64-b7e995b2a6d8")));
+        List<Item> i = postgresDao.getItems(numItem, 0, Optional.of(UUID.fromString("036ebde5-369d-4cca-ae64-b7e995b2a6d8")));
         assertTrue(i.size()<=numItem);
     }
 }

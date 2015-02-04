@@ -12,5 +12,5 @@ import java.util.UUID;
 public interface ShareItemDao {
     void addShareItem(Item item, UUID userId);
 
-    List<Item> getItems(int numItems, Optional<UUID> userId);
+    List<Item> getItems(int numItems, int offset, Optional<UUID> userId);
 }

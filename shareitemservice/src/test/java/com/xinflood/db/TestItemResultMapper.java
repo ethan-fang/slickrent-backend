@@ -17,7 +17,7 @@ public class TestItemResultMapper {
 
     @Test
     public void testMapper() {
-        List<Item> item = postgresDao.getItems(1, Optional.<UUID>absent());
+        List<Item> item = postgresDao.getItems(1, 0, Optional.<UUID>absent());
         assertEquals(1, item.size());
     }
 }

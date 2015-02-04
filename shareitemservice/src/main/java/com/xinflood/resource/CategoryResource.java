@@ -16,8 +16,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Created by xinxinwang on 12/18/14.
  */
-@Path("/category")
-@Api(value = "/category", description = "get category information")
+@Path("/api/category")
+@Api(value = "/api/category", description = "get category information")
 @Produces(MediaType.APPLICATION_JSON)
 public class CategoryResource {
 

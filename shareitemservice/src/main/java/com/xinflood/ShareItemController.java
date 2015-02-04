@@ -50,8 +50,8 @@ public class ShareItemController {
     }
 
 
-    public List<Item> getItems(int numItems, Optional<UUID> userId) throws ExecutionException, InterruptedException {
-        Future<List<Item>> future = executorService.submit(new GetItemsTask(shareItemDao, numItems, userId));
+    public List<Item> getItems(int numItems, int offset, Optional<UUID> userId) throws ExecutionException, InterruptedException {
+        Future<List<Item>> future = executorService.submit(new GetItemsTask(shareItemDao, numItems, offset , userId));
         return future.get();
     }
 
@@ -78,17 +78,19 @@ public class ShareItemController {
 
         private final ShareItemDao shareItemDao;
         private final int numItems;
+        private final int offset;
         private final Optional<UUID> userId;
 
-        private GetItemsTask(ShareItemDao shareItemDao, int numItems, Optional<UUID> userId) {
+        private GetItemsTask(ShareItemDao shareItemDao, int numItems, int offset, Optional<UUID> userId) {
             this.shareItemDao = shareItemDao;
             this.numItems = numItems;
+            this.offset = offset;
             this.userId = userId;
         }
 
         @Override
         public List<Item> call() throws Exception {
-            return shareItemDao.getItems(numItems, userId);
+            return shareItemDao.getItems(numItems, offset , userId);
         }
     }
 

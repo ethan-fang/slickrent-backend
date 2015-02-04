@@ -9,6 +9,8 @@ retrieve_items(size, userId) ::= <<
 SELECT *
 FROM slickrent.item
 <if(userId)> where id = :userId<endif>
+ORDER by id
+OFFSET :offset
 <if(size)> LIMIT <size><endif>
 >>
 

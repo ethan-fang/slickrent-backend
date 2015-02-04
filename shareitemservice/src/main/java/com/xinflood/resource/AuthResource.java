@@ -17,8 +17,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/user")
-@Api(value = "/user", description = "user sign in/up")
+@Path("/api/user")
+@Api(value = "/api/user", description = "user sign in/up")
 @Produces(MediaType.APPLICATION_JSON)
 public class AuthResource {
     private UserDao userDao;

@@ -64,9 +64,10 @@ public class PostgresDao implements ShareItemDao, UserDao {
     }
 
     @Override
-    public List<Item> getItems(int numItems, Optional<UUID> userId) {
+    public List<Item> getItems(int numItems, int offset, Optional<UUID> userId) {
         HandleCallback<List<Item>> callback = handle -> {
             Query<Map<String, Object>> query = handle.createQuery("retrieve_items");
+            query.bind("offset", offset);
             if(numItems >=0) {
                 query.define("size", numItems);
             }

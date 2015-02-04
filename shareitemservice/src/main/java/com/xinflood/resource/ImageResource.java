@@ -27,8 +27,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  */
-@Path("/image")
-@Api(value = "/image", description = "image related endpoints")
+@Path("/api/image")
+@Api(value = "/api/image", description = "image related endpoints")
 @Produces(MediaType.APPLICATION_JSON)
 public class ImageResource {
     private final ImageDao imageDao;
@@ -47,7 +47,13 @@ public class ImageResource {
         checkNotNull(body.getField("image"));
 
         InputStream image = body.getField("image").getValueAs(InputStream.class);
-        UUID imageKey = UUID.randomUUID();
+
+        UUID imageKey;
+        if(body.getField("imageUuid") != null) {
+            imageKey = UUID.fromString(body.getField("imageUuid").getValue());
+        } else {
+            imageKey = UUID.randomUUID();
+        }
 
         if(imageDao.putImage(imageKey.toString(), ByteStreams.toByteArray(image))) {
             Response.Status status = Response.Status.CREATED;

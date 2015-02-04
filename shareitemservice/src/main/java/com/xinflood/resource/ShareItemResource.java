@@ -32,8 +32,8 @@ import static com.google.common.base.Preconditions.checkState;
 /**
  * Created by xinxinwang on 11/16/14.
  */
-@Api(value = "/shareitem", description = "share a new item")
-@Path("/shareitem")
+@Api(value = "/api/shareitem", description = "share a new item")
+@Path("/api/shareitem")
 @Produces(MediaType.APPLICATION_JSON)
 public class ShareItemResource {
 
@@ -61,8 +61,11 @@ public class ShareItemResource {
 
     @GET
     @ApiOperation(value = "get items for an optional user", response = String.class)
-    public Response getItems(@QueryParam("size") @DefaultValue("10") int size, @QueryParam("userId") UUID userId) throws ExecutionException, InterruptedException {
-        List<Item> items = shareItemController.getItems(size, Optional.fromNullable(userId));
+    public Response getItems(@QueryParam("size") @DefaultValue("10") int size,
+                             @QueryParam("offset") Optional<Integer> offset,
+                             @QueryParam("userId") UUID userId) throws ExecutionException, InterruptedException {
+
+        List<Item> items = shareItemController.getItems(size, offset.or(0), Optional.fromNullable(userId));
         return Response.ok(ImmutableMap.of("items", items)).build();
     }
 }
