@@ -13,4 +13,6 @@ public interface ShareItemDao {
     void addShareItem(Item item, UUID userId);
 
     List<Item> getItems(int numItems, int offset, Optional<UUID> userId);
+
+    Optional<Item> getItem(UUID itemId);
 }

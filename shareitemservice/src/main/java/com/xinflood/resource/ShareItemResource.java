@@ -68,4 +68,14 @@ public class ShareItemResource {
         List<Item> items = shareItemController.getItems(size, offset.or(0), Optional.fromNullable(userId));
         return Response.ok(ImmutableMap.of("items", items)).build();
     }
+
+    @GET
+    @ApiOperation(value = "get an item for the item id", response = String.class)
+    @Path("/{itemId}")
+    public Response getItem(@PathParam("itemId") UUID itemId) throws ExecutionException, InterruptedException {
+
+
+        Optional<Item> item = shareItemController.getItem(itemId);
+        return Response.ok(ImmutableMap.of("item", item)).build();
+    }
 }

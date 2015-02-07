@@ -39,10 +39,6 @@ public class DbMigrationRunner {
             }
 
             flyway.setSchemas(migrationConfiguration.getSchema());
-            flyway.setBaselineOnMigrate(true);
-            flyway.setBaselineVersion("1");
-            flyway.setBaselineDescription("Base version");
-            flyway.setValidateOnMigrate(false);
             flyway.migrate();
             LOGGER.info("Current schema version is {}", flyway.info().current().getVersion().toString());
 

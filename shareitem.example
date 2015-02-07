@@ -1,1 +1,17 @@
-{"itemName":"1","itemDescription":"22","pricePerHour":"3","images":["e7568b2c-2c0f-480e-9e34-08f9a4b807dc"],"quantity":1,"rentalPeriods":[{"lowerBoundType":"CLOSED","lowerEndpoint":"2015-02-03T14:00:00.000Z","upperBoundType":"CLOSED","upperEndpoint":"2015-02-05T13:00:00.000Z"}]}
+{
+  "itemName": "1",
+  "itemDescription": "22",
+  "pricePerHour": "3",
+  "images": [
+    "e7568b2c-2c0f-480e-9e34-08f9a4b807dc"
+  ],
+  "quantity": 1,
+  "rentalPeriods": [
+    {
+      "lowerBoundType": "CLOSED",
+      "lowerEndpoint": "2015-02-03T14:00:00.000Z",
+      "upperBoundType": "CLOSED",
+      "upperEndpoint": "2015-02-05T13:00:00.000Z"
+    }
+  ]
+}

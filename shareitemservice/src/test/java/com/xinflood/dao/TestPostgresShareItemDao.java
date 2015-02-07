@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.xinflood.DaoHelper;
 import com.xinflood.domainobject.Item;
+import com.xinflood.domainobject.RentalPricePerHour;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
@@ -22,7 +23,9 @@ public class TestPostgresShareItemDao {
     @Test
     public void testInsertShareItem() {
         Item item = new Item(
-                UUID.randomUUID(), "name", "description",
+                UUID.randomUUID(), "name",
+                RentalPricePerHour.random(),
+                "description",
                 Range.closed(DateTime.now(), DateTime.now().plusDays(1)),
                 ImmutableList.of(UUID.randomUUID())
         );

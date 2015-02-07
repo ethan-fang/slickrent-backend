@@ -19,7 +19,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RequestItemMetadata {
     private final String itemName;
     private final String itemDescription;
-    private final double pricePerHourInDollar;
+    private final double pricePerHourInCent;
     private final ImmutableList<UUID> imageUuids;
     private final int quantity;
     private final ImmutableList<Range<DateTime>> rentalRanges;
@@ -27,15 +27,15 @@ public class RequestItemMetadata {
     @JsonCreator
     public RequestItemMetadata(@JsonProperty("itemName") String itemName,
                                @JsonProperty("itemDescription") String itemDescription,
-                               @JsonProperty("pricePerHour") double pricePerHourInDollar,
+                               @JsonProperty("pricePerHour") double pricePerHourInCent,
                                @JsonProperty("images") List<UUID> imageUuids,
                                @JsonProperty("quantity") int quantity,
                                @JsonProperty("rentalPeriods") List<Range<DateTime>> rentalRanges) {
         this.itemName = checkNotNull(itemName);
         this.itemDescription = checkNotNull(itemDescription);
 
-        checkArgument(pricePerHourInDollar >= 0, "pricePerHourInDollar %f should be greater than 0", pricePerHourInDollar);
-        this.pricePerHourInDollar =  pricePerHourInDollar;
+        checkArgument(pricePerHourInCent >= 0, "pricePerHourInCent %f should be greater than 0", pricePerHourInCent);
+        this.pricePerHourInCent = pricePerHourInCent;
 
         checkArgument(quantity > 0, "quantity %f should be greater than 0", quantity);
         this.quantity =  quantity;
@@ -56,8 +56,8 @@ public class RequestItemMetadata {
     }
 
     @JsonProperty
-    public double getPricePerHourInDollar() {
-        return pricePerHourInDollar;
+    public double getPricePerHourInCent() {
+        return pricePerHourInCent;
     }
 
     @JsonProperty
@@ -81,7 +81,7 @@ public class RequestItemMetadata {
         return MoreObjects.toStringHelper(this)
                 .add("itemName", itemName)
                 .add("itemDescription", itemDescription)
-                .add("pricePerHourInDollar", pricePerHourInDollar)
+                .add("pricePerHourInCent", pricePerHourInCent)
                 .add("imageUuids", imageUuids)
                 .add("quantity", quantity)
                 .add("rentalRanges", rentalRanges)

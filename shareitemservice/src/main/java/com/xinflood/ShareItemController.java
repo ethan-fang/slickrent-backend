@@ -55,6 +55,10 @@ public class ShareItemController {
         return future.get();
     }
 
+    public Optional<Item> getItem(UUID itemId) throws ExecutionException, InterruptedException {
+        Future<Optional<Item>> future = executorService.submit(new GetOneItemTask(shareItemDao, itemId));
+        return future.get();
+    }
 
     private List<UUID> uploadImages(Collection<InputStream> imageUploads) throws IOException, ExecutionException, InterruptedException {
 
@@ -91,6 +95,21 @@ public class ShareItemController {
         @Override
         public List<Item> call() throws Exception {
             return shareItemDao.getItems(numItems, offset , userId);
+        }
+    }
+
+    private static class GetOneItemTask implements Callable<Optional<Item>> {
+        private final ShareItemDao shareItemDao;
+        private final UUID itemId;
+
+        private GetOneItemTask(ShareItemDao shareItemDao, UUID itemId) {
+            this.shareItemDao = shareItemDao;
+            this.itemId = itemId;
+        }
+
+        @Override
+        public Optional<Item> call() throws Exception {
+            return shareItemDao.getItem(itemId);
         }
     }
 

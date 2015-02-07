@@ -6,6 +6,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,12 +18,14 @@ public class Item {
     private final UUID id;
     private final String itemName;
     private final String itemDescription;
+    private final RentalPricePerHour price;
     private final Range<DateTime> rentalPeriod;
     private final ImmutableList<UUID> imageUuids;
 
     @JsonCreator
     public Item(@JsonProperty("id") UUID id,
                 @JsonProperty("itemName") String itemName,
+                @JsonProperty("price") RentalPricePerHour price,
                 @JsonProperty("itemDescription") String itemDescription,
                 @JsonProperty("rentalPeriod") Range<DateTime> rentalPeriod,
                 @JsonProperty("imageUuids") List<UUID> imageUuids
@@ -30,6 +33,7 @@ public class Item {
     ) {
         this.id = id;
         this.itemName = itemName;
+        this.price = price;
         this.itemDescription = itemDescription;
         this.rentalPeriod = rentalPeriod;
         this.imageUuids = ImmutableList.copyOf(imageUuids);
@@ -60,6 +64,10 @@ public class Item {
         return imageUuids;
     }
 
+    @JsonProperty
+    public RentalPricePerHour getPrice() {
+        return price;
+    }
 
     @Override
     public String toString() {
@@ -76,6 +84,7 @@ public class Item {
         return new Item(
                 UUID.randomUUID(),
                 requestItemMetadata.getItemName(),
+                RentalPricePerHour.of(requestItemMetadata.getPricePerHourInCent(), Duration.standardHours(1)),
                 requestItemMetadata.getItemDescription(),
                 requestItemMetadata.getRentalRanges().get(0),
                 requestItemMetadata.getImageUuids());

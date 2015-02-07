@@ -14,10 +14,15 @@ CREATE TABLE slickrent.item (
   id UUID NOT NULL PRIMARY KEY,
   item_name TEXT,
   item_description TEXT,
+  price_usd_cent_per_min NUMERIC,
   rental_start TIMESTAMP WITH TIME ZONE,
   rental_end TIMESTAMP WITH TIME ZONE,
   image_uuids UUID[],
   user_id UUID REFERENCES slickrent.user (id)
 );
+
 CREATE INDEX item_id_index ON slickrent.item(id);
+CREATE INDEX item_user_id_index ON slickrent.item(user_id);
+
+
 

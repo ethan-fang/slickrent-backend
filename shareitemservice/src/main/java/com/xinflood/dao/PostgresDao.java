@@ -2,6 +2,7 @@ package com.xinflood.dao;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
+import com.google.common.collect.Iterators;
 import com.google.common.io.BaseEncoding;
 import com.xinflood.db.DateTimeArgumentFactory;
 import com.xinflood.db.ItemResultMapper;
@@ -46,6 +47,7 @@ public class PostgresDao implements ShareItemDao, UserDao {
             update.bind("id", item.getId());
             update.bind("item_name", item.getItemName());
             update.bind("item_description", item.getItemDescription());
+            update.bind("price_usd_cent_per_min", item.getPrice().getAmount().getAmountMinorInt());
             update.bind("rental_start", item.getRentalPeriod().lowerEndpoint());
             update.bind("rental_end", item.getRentalPeriod().upperEndpoint());
             update.bind("image_uuids", SqlArray.arrayOf(UUID.class, item.getImageUuids()));
@@ -76,6 +78,23 @@ public class PostgresDao implements ShareItemDao, UserDao {
                 query.bind("userId", userId.get()).define("userId", userId.get());
             }
             return query.map(ItemResultMapper.INSTANCE).list();
+        };
+        return dbi.withHandle(callback);
+    }
+
+    @Override
+    public Optional<Item> getItem(UUID itemId) {
+        HandleCallback<Optional<Item>> callback = handle -> {
+            Query<Map<String, Object>> query = handle.createQuery("get_item");
+            query.bind("itemId", itemId);
+
+
+            List<Item> result = query.map(ItemResultMapper.INSTANCE).list();
+            if(result.isEmpty()) {
+                return Optional.absent();
+            } else {
+                return Optional.of(Iterators.getOnlyElement(result.iterator()));
+            }
         };
         return dbi.withHandle(callback);
     }
