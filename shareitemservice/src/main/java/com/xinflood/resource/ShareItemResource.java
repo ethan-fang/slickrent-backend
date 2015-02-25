@@ -63,9 +63,9 @@ public class ShareItemResource {
     @ApiOperation(value = "get items for an optional user", response = String.class)
     public Response getItems(@QueryParam("size") @DefaultValue("10") int size,
                              @QueryParam("offset") Optional<Integer> offset,
-                             @QueryParam("userId") UUID userId) throws ExecutionException, InterruptedException {
+                             @QueryParam("userId") Optional<UUID> userId) throws ExecutionException, InterruptedException {
 
-        List<Item> items = shareItemController.getItems(size, offset.or(0), Optional.fromNullable(userId));
+        List<Item> items = shareItemController.getItems(size, offset.or(0), userId);
         return Response.ok(ImmutableMap.of("items", items)).build();
     }
 

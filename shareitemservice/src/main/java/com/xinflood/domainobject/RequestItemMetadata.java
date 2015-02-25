@@ -3,6 +3,7 @@ package com.xinflood.domainobject;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import org.joda.time.DateTime;
@@ -19,29 +20,28 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RequestItemMetadata {
     private final String itemName;
     private final String itemDescription;
-    private final double pricePerHourInCent;
+    private final Optional<Double> pricePerHourInCent;
     private final ImmutableList<UUID> imageUuids;
     private final int quantity;
-    private final ImmutableList<Range<DateTime>> rentalRanges;
+    private final Optional<List<Range<DateTime>>> rentalRanges;
 
     @JsonCreator
     public RequestItemMetadata(@JsonProperty("itemName") String itemName,
                                @JsonProperty("itemDescription") String itemDescription,
-                               @JsonProperty("pricePerHour") double pricePerHourInCent,
+                               @JsonProperty("pricePerHour") Optional<Double> pricePerHourInCent,
                                @JsonProperty("images") List<UUID> imageUuids,
                                @JsonProperty("quantity") int quantity,
-                               @JsonProperty("rentalPeriods") List<Range<DateTime>> rentalRanges) {
+                               @JsonProperty("rentalPeriods") Optional<List<Range<DateTime>>> rentalRanges) {
         this.itemName = checkNotNull(itemName);
         this.itemDescription = checkNotNull(itemDescription);
 
-        checkArgument(pricePerHourInCent >= 0, "pricePerHourInCent %f should be greater than 0", pricePerHourInCent);
         this.pricePerHourInCent = pricePerHourInCent;
 
         checkArgument(quantity > 0, "quantity %f should be greater than 0", quantity);
         this.quantity =  quantity;
 
         this.imageUuids = ImmutableList.copyOf(checkNotNull(imageUuids));
-        this.rentalRanges = ImmutableList.copyOf(checkNotNull(rentalRanges));
+        this.rentalRanges = checkNotNull(rentalRanges);
     }
 
 
@@ -55,12 +55,12 @@ public class RequestItemMetadata {
         return itemDescription;
     }
 
-    @JsonProperty
-    public double getPricePerHourInCent() {
+    @JsonProperty("pricePerHour")
+    public Optional<Double> getPricePerHourInCent() {
         return pricePerHourInCent;
     }
 
-    @JsonProperty
+    @JsonProperty("images")
     public ImmutableList<UUID> getImageUuids() {
         return imageUuids;
     }
@@ -70,8 +70,8 @@ public class RequestItemMetadata {
         return quantity;
     }
 
-    @JsonProperty
-    public ImmutableList<Range<DateTime>> getRentalRanges() {
+    @JsonProperty("rentalPeriods")
+    public Optional<List<Range<DateTime>>> getRentalRanges() {
         return rentalRanges;
     }
 

@@ -1,17 +1,17 @@
 group sql;
 
 add_item() ::= <<
-INSERT INTO slickrent.item (id, item_name, item_description, price_usd_cent_per_min, rental_start, rental_end, image_uuids)
-VALUES (:id, :item_name, :item_description, :price_usd_cent_per_min,:rental_start, :rental_end, :image_uuids)
+INSERT INTO slickrent.item (id, item_name, item_description, price_usd_cent_per_min, rental_start, rental_end, image_uuids, user_id)
+VALUES (:id, :item_name, :item_description, :price_usd_cent_per_min,:rental_start, :rental_end, :image_uuids, :user_id)
 >>
 
 retrieve_items(size, userId) ::= <<
 SELECT *
 FROM slickrent.item
-<if(userId)> where id = :userId<endif>
-ORDER by id
+<if(userId)> where user_id = :userId<endif>
+ORDER by created_time
 OFFSET :offset
-<if(size)> LIMIT <size><endif>
+<if(size)> LIMIT :size<endif>
 >>
 
 get_item() ::= <<

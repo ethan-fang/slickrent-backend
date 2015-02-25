@@ -10,6 +10,7 @@ import com.xinflood.dao.UserDao;
 import com.xinflood.domainobject.User;
 import com.xinflood.domainobject.UsernamePasswordPair;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -48,18 +49,18 @@ public class AuthResource {
 
 
     // temporary comment out to disable signup
-//    @POST
-//    @Path("/signup")
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @ApiOperation(value = "new user sign up", response = String.class)
-//    public Response userSignUp(
-//            @ApiParam(value = "username and password in json", required = true)
-//            UsernamePasswordPair usernamePasswordPair
-//    ) {
-//        String username = usernamePasswordPair.getUsername();
-//        String password = usernamePasswordPair.getPassword();
-//        Optional<User> user = userDao.createNewUser(username, password);
-//
-//        return Response.ok(ImmutableMap.of("user", user)).build();
-//    }
+    @POST
+    @Path("/signup")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "new user sign up", response = String.class)
+    public Response userSignUp(
+            @ApiParam(value = "username and password in json", required = true)
+            UsernamePasswordPair usernamePasswordPair
+    ) {
+        String username = usernamePasswordPair.getUsername();
+        String password = usernamePasswordPair.getPassword();
+        Optional<User> user = userDao.createNewUser(username, password);
+
+        return Response.ok(ImmutableMap.of("user", user)).build();
+    }
 }

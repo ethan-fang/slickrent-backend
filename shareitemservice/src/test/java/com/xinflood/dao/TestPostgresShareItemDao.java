@@ -23,10 +23,9 @@ public class TestPostgresShareItemDao {
     @Test
     public void testInsertShareItem() {
         Item item = new Item(
-                UUID.randomUUID(), "name",
-                RentalPricePerHour.random(),
-                "description",
-                Range.closed(DateTime.now(), DateTime.now().plusDays(1)),
+                UUID.randomUUID(), "name", "description",
+                Optional.of(RentalPricePerHour.random()),
+                Optional.of(Range.closed(DateTime.now(), DateTime.now().plusDays(1))),
                 ImmutableList.of(UUID.randomUUID())
         );
 

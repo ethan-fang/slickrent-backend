@@ -47,11 +47,23 @@ public class PostgresDao implements ShareItemDao, UserDao {
             update.bind("id", item.getId());
             update.bind("item_name", item.getItemName());
             update.bind("item_description", item.getItemDescription());
-            update.bind("price_usd_cent_per_min", item.getPrice().getAmount().getAmountMinorInt());
-            update.bind("rental_start", item.getRentalPeriod().lowerEndpoint());
-            update.bind("rental_end", item.getRentalPeriod().upperEndpoint());
             update.bind("image_uuids", SqlArray.arrayOf(UUID.class, item.getImageUuids()));
             update.bind("user_id", userId);
+
+            if(item.getPrice().isPresent()) {
+                update.bind("price_usd_cent_per_min", item.getPrice().get().getAmount().getAmountMinorInt());
+            } else {
+                update.bind("price_usd_cent_per_min", 0);
+            }
+
+            if(item.getRentalPeriod().isPresent()) {
+                update.bind("rental_start", item.getRentalPeriod().get().lowerEndpoint());
+                update.bind("rental_end", item.getRentalPeriod().get().upperEndpoint());
+            } else {
+                update.bind("rental_start", (DateTime)null);
+                update.bind("rental_end", (DateTime)null);
+            }
+
 
             int rowsModified = update.execute();
             if(rowsModified != 1) {
@@ -71,7 +83,7 @@ public class PostgresDao implements ShareItemDao, UserDao {
             Query<Map<String, Object>> query = handle.createQuery("retrieve_items");
             query.bind("offset", offset);
             if(numItems >=0) {
-                query.define("size", numItems);
+                query.define("size", numItems).bind("size", numItems);
             }
 
             if(userId.isPresent()) {

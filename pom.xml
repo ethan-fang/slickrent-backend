@@ -87,6 +87,12 @@
 
             <dependency>
                 <groupId>io.dropwizard</groupId>
+                <artifactId>dropwizard-client</artifactId>
+                <version>${dep.dropwizard.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.dropwizard</groupId>
                 <artifactId>dropwizard-lifecycle</artifactId>
                 <version>${dep.dropwizard.version}</version>
             </dependency>
@@ -254,6 +260,12 @@
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-core</artifactId>
+                <version>${dep.jersey.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-client</artifactId>
                 <version>${dep.jersey.version}</version>
             </dependency>
 

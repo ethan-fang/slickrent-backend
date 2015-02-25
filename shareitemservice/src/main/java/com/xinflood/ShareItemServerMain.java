@@ -7,10 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.sun.jersey.api.container.filter.LoggingFilter;
 import com.sun.jersey.multipart.impl.MultiPartConfigProvider;
 import com.xinflood.auth.BearerTokenOAuth2Provider;
 import com.xinflood.auth.ClientIdRequestFilter;
@@ -21,6 +21,7 @@ import com.xinflood.dao.PostgresDao;
 import com.xinflood.dao.S3ImageDao;
 import com.xinflood.migration.DbMigrationBundle;
 import com.xinflood.migration.WithDbMigrationConfiguration;
+import com.xinflood.misc.autozone.AutoZoneDataLoaderCommand;
 import com.xinflood.resource.AuthResource;
 import com.xinflood.resource.CategoryResource;
 import com.xinflood.resource.ImageResource;
@@ -63,6 +64,8 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
 
         // add flyway migration
         bootstrap.addBundle(new DbMigrationBundle<WithDbMigrationConfiguration>());
+
+        bootstrap.addCommand(new AutoZoneDataLoaderCommand(this, "autozoneload", "autozone-data-loader"));
     }
 
     @Override
@@ -75,7 +78,6 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
         configureCors(environment);
 
         final ObjectMapper objectMapper = environment.getObjectMapper();
-        objectMapper.registerModule(new JodaModule());
         objectMapper.configure(SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS, false);
         objectMapper.setDateFormat(new ISO8601DateFormat());
 
@@ -124,6 +126,13 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
         }
 
         environment.healthChecks().register("heartbeat", new HeartbeatHealthCheck());
+
+        // add logging filter
+        LoggingFilter loggingFilter = new LoggingFilter();
+        environment.jersey().getResourceConfig().getContainerRequestFilters().add(loggingFilter);
+        environment.jersey().getResourceConfig().getContainerResponseFilters().add(loggingFilter);
+
+
     }
 
     private ListeningExecutorService getManagedListeningExecutorService(final Environment environment,

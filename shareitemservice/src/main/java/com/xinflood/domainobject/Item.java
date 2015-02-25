@@ -3,10 +3,10 @@ package com.xinflood.domainobject;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import org.joda.time.DateTime;
-import org.joda.time.Duration;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,16 +18,16 @@ public class Item {
     private final UUID id;
     private final String itemName;
     private final String itemDescription;
-    private final RentalPricePerHour price;
-    private final Range<DateTime> rentalPeriod;
+    private final Optional<RentalPricePerHour> price;
+    private final Optional<Range<DateTime>> rentalPeriod;
     private final ImmutableList<UUID> imageUuids;
 
     @JsonCreator
     public Item(@JsonProperty("id") UUID id,
                 @JsonProperty("itemName") String itemName,
-                @JsonProperty("price") RentalPricePerHour price,
                 @JsonProperty("itemDescription") String itemDescription,
-                @JsonProperty("rentalPeriod") Range<DateTime> rentalPeriod,
+                @JsonProperty("price") Optional<RentalPricePerHour> price,
+                @JsonProperty("rentalPeriod") Optional<Range<DateTime>> rentalPeriod,
                 @JsonProperty("imageUuids") List<UUID> imageUuids
 
     ) {
@@ -55,7 +55,7 @@ public class Item {
     }
 
     @JsonProperty
-    public Range<DateTime> getRentalPeriod() {
+    public Optional<Range<DateTime>> getRentalPeriod() {
         return rentalPeriod;
     }
 
@@ -65,7 +65,7 @@ public class Item {
     }
 
     @JsonProperty
-    public RentalPricePerHour getPrice() {
+    public Optional<RentalPricePerHour> getPrice() {
         return price;
     }
 
@@ -81,12 +81,23 @@ public class Item {
     }
 
     public static Item of(RequestItemMetadata requestItemMetadata) {
+
+        Optional<RentalPricePerHour> rentalPricePerHour = Optional.absent();
+        if(requestItemMetadata.getPricePerHourInCent().isPresent()) {
+            rentalPricePerHour = Optional.of(RentalPricePerHour.ofDollarPerHour(requestItemMetadata.getPricePerHourInCent().get()));
+        }
+
+        Optional<Range<DateTime>> rentalRange = Optional.absent();
+        if(requestItemMetadata.getRentalRanges().isPresent()) {
+            rentalRange = Optional.of(requestItemMetadata.getRentalRanges().get().get(0));
+        }
+
         return new Item(
                 UUID.randomUUID(),
                 requestItemMetadata.getItemName(),
-                RentalPricePerHour.of(requestItemMetadata.getPricePerHourInCent(), Duration.standardHours(1)),
                 requestItemMetadata.getItemDescription(),
-                requestItemMetadata.getRentalRanges().get(0),
+                rentalPricePerHour,
+                rentalRange,
                 requestItemMetadata.getImageUuids());
     }
 
