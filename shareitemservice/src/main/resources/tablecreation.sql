@@ -1,13 +1,17 @@
-create table shareitemschema.user (
+
+CREATE TYPE SOCIAL_PLATFORM as ENUM ('fb','google');
+
+CREATE TABLE shareitemschema.user (
   id UUID NOT NULL PRIMARY KEY,
   username TEXT NOT NULL,
-  password TEXT NOT NULL,
-  access_token TEXT
+  password TEXT,
+  access_token TEXT NOT NULL,
+  social_platform SOCIAL_PLATFORM
 )
-CREATE INDEX user_index ON shareitemschema.user(id, access_token);
+CREATE INDEX user_index ON shareitemschema.user(id, username, access_token);
 
 
-create table shareitemschema.item (
+CREATE TABLE shareitemschema.item (
   id UUID NOT NULL PRIMARY KEY,
   item_name TEXT,
   item_description TEXT,

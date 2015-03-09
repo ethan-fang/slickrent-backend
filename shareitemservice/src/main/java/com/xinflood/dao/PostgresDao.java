@@ -10,6 +10,7 @@ import com.xinflood.db.PostgresUuidSqlArrayArgumentFactory;
 import com.xinflood.db.SqlArray;
 import com.xinflood.db.UserMapper;
 import com.xinflood.domainobject.Item;
+import com.xinflood.domainobject.SocialSignInRequest;
 import com.xinflood.domainobject.User;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -115,7 +116,12 @@ public class PostgresDao implements ShareItemDao, UserDao {
     @Override
     public Optional<User> findUserByUsernameAndPassword(final String username, final String password) {
         HandleCallback<Optional<User>> callback = handle -> {
-            List<User> queryResult = handle.createQuery("get_user_by_username").bind("username", username).map(UserMapper.INSTANCE).list();
+            List<User> queryResult =
+                    handle
+                    .createQuery("get_user_by_username_password")
+                    .bind("username", username)
+                    .bind("password", password)
+                    .map(UserMapper.INSTANCE).list();
 
             Optional<User> user;
             if(queryResult.size() == 0) {
@@ -170,6 +176,26 @@ public class PostgresDao implements ShareItemDao, UserDao {
         };
 
         return dbi.withHandle(callback);
+    }
+
+    @Override
+    public void updateSocialLogin(SocialSignInRequest socialSignInRequest) {
+        HandleCallback<Optional<User>> callback = handle -> {
+            Update update = handle.createStatement("upsert_user_social_login");
+
+            update.define("id", UUID.randomUUID())
+                  .define("username", socialSignInRequest.getUsername())
+                    .define("access_token", socialSignInRequest.getToken())
+                    .define("login_platform", socialSignInRequest.getLoginPlatform().getName())
+                    .bind("username", socialSignInRequest.getUsername())
+                    .bind("access_token", socialSignInRequest.getToken())
+                    .bind("login_platform", socialSignInRequest.getLoginPlatform().getName())
+                    .execute();
+
+            return null;
+        };
+
+        dbi.withHandle(callback);
     }
 
     private String createNewAccessToken(String username) {

@@ -42,3 +42,20 @@ SELECT *
 FROM slickrent.user
 WHERE access_token=:access_token
 >>
+
+
+get_user_by_username_password() ::= <<
+SELECT *
+FROM slickrent.user
+WHERE username=:username and password=:password
+>>
+
+upsert_user_social_login(id, username, access_token, login_platform) ::= <<
+WITH
+platform_id AS (SELECT id from slickrent.login_platform where platform = :login_platform limit 1),
+upsert AS (UPDATE slickrent.user SET  access_token=:access_token where username=:username and login_platform_id in (select * from platform_id)
+RETURNING *
+)
+INSERT INTO slickrent.user (id, username, access_token, login_platform_id)
+SELECT '<id>', '<username>', '<access_token>', (select * from platform_id) WHERE NOT EXISTS (SELECT * FROM upsert);
+>>

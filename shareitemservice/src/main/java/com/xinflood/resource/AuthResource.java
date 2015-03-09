@@ -7,6 +7,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.xinflood.dao.UserDao;
+import com.xinflood.domainobject.SocialSignInRequest;
 import com.xinflood.domainobject.User;
 import com.xinflood.domainobject.UsernamePasswordPair;
 
@@ -46,6 +47,21 @@ public class AuthResource {
 
         return Response.ok(ImmutableMap.of("user", user.get())).build();
     }
+
+    @POST
+    @Path("/social-login")
+    @ApiOperation(value = "sign in with social network", response = String.class)
+    public Response updateSocialToken(
+            @ApiParam(value = "username and password in json", required = true)
+            SocialSignInRequest socialSignInRequest
+    ) {
+        // Try to find a user with the supplied credentials.
+        userDao.updateSocialLogin(socialSignInRequest);
+
+        return Response.ok(ImmutableMap.of("token", socialSignInRequest.getToken())).build();
+    }
+
+
 
 
     // temporary comment out to disable signup
