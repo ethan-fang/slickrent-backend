@@ -56,9 +56,16 @@ public class AuthResource {
             SocialSignInRequest socialSignInRequest
     ) {
         // Try to find a user with the supplied credentials.
-        userDao.updateSocialLogin(socialSignInRequest);
+        Optional<User> user = userDao.updateSocialLogin(socialSignInRequest);
 
-        return Response.ok(ImmutableMap.of("token", socialSignInRequest.getToken())).build();
+        if(user.isPresent()) {
+            return Response.ok(ImmutableMap.of("user", user.get())).build();
+        } else {
+            throw new WebApplicationException(
+                    Response.status(Response.Status.UNAUTHORIZED)
+                            .entity(ImmutableMap.of("error", "user not found for request " + socialSignInRequest))
+                            .build());
+        }
     }
 
 

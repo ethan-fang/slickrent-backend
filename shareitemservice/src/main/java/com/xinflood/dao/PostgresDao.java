@@ -2,6 +2,7 @@ package com.xinflood.dao;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.io.BaseEncoding;
 import com.xinflood.db.DateTimeArgumentFactory;
@@ -10,6 +11,7 @@ import com.xinflood.db.PostgresUuidSqlArrayArgumentFactory;
 import com.xinflood.db.SqlArray;
 import com.xinflood.db.UserMapper;
 import com.xinflood.domainobject.Item;
+import com.xinflood.domainobject.LoginPlatform;
 import com.xinflood.domainobject.SocialSignInRequest;
 import com.xinflood.domainobject.User;
 import org.joda.time.DateTime;
@@ -19,6 +21,7 @@ import org.skife.jdbi.v2.Query;
 import org.skife.jdbi.v2.Update;
 import org.skife.jdbi.v2.sqlobject.stringtemplate.StringTemplate3StatementLocator;
 import org.skife.jdbi.v2.tweak.HandleCallback;
+import org.skife.jdbi.v2.util.StringMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -179,23 +182,32 @@ public class PostgresDao implements ShareItemDao, UserDao {
     }
 
     @Override
-    public void updateSocialLogin(SocialSignInRequest socialSignInRequest) {
+    public Optional<User> updateSocialLogin(SocialSignInRequest socialSignInRequest) {
         HandleCallback<Optional<User>> callback = handle -> {
-            Update update = handle.createStatement("upsert_user_social_login");
+            Query<Map<String, Object>> query = handle.createQuery("upsert_user_social_login");
 
-            update.define("id", UUID.randomUUID())
-                  .define("username", socialSignInRequest.getUsername())
-                    .define("access_token", socialSignInRequest.getToken())
-                    .define("login_platform", socialSignInRequest.getLoginPlatform().getName())
-                    .bind("username", socialSignInRequest.getUsername())
-                    .bind("access_token", socialSignInRequest.getToken())
-                    .bind("login_platform", socialSignInRequest.getLoginPlatform().getName())
-                    .execute();
+            String username = socialSignInRequest.getUsername();
+            String password = null;
+            String accessToken = socialSignInRequest.getToken();
+            LoginPlatform loginPlatform = socialSignInRequest.getLoginPlatform();
 
-            return null;
+
+            String updatedUserId =
+                    Iterables.getOnlyElement(query.define("id", UUID.randomUUID())
+                            .define("username", username)
+                            .define("access_token", accessToken)
+                            .define("login_platform", loginPlatform.getName())
+                            .bind("username", username)
+                            .bind("access_token", accessToken)
+                            .bind("login_platform", loginPlatform.getName())
+                            .map(new StringMapper())
+                            .list()
+            );
+
+            return Optional.of(new User(UUID.fromString(updatedUserId), username, password, accessToken, loginPlatform));
         };
 
-        dbi.withHandle(callback);
+        return dbi.withHandle(callback);
     }
 
     private String createNewAccessToken(String username) {

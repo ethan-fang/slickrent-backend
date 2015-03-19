@@ -13,5 +13,5 @@ public interface UserDao {
 
     Optional<User> findUserByToken(String token);
 
-    void updateSocialLogin(SocialSignInRequest socialSignInRequest);
+    Optional<User> updateSocialLogin(SocialSignInRequest socialSignInRequest);
 }

@@ -38,18 +38,4 @@ public class S3ImageDao implements ImageDao {
 
         return ByteStreams.toByteArray(s3Object.getObjectContent());
     }
-
-//    private static void displayTextInputStream(InputStream input)
-//            throws IOException {
-//        // Read one text line at a time and display.
-//        BufferedReader reader = new BufferedReader(new
-//                InputStreamReader(input));
-//        while (true) {
-//            String line = reader.readLine();
-//            if (line == null) break;
-//
-//            System.out.println("    " + line);
-//        }
-//        System.out.println();
-//    }
 }

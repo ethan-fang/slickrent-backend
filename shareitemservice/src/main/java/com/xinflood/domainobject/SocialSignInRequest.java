@@ -22,6 +22,7 @@ public class SocialSignInRequest {
     ) {
         this.username = checkNotNull(username);
         this.token = checkNotNull(token);
+
         checkNotNull(loginPlatform);
         this.loginPlatform = loginPlatform.isPresent()?loginPlatform.get() : LoginPlatform.NATIVE;
     }
