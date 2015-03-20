@@ -102,7 +102,8 @@ public class AutoZoneScraper implements ItemScraper {
                                 tool.getCategoryName(),
                                 Optional.<RentalPricePerHour>absent(),
                                 Optional.<Range<DateTime>>absent(),
-                                ImmutableList.of(imageUuid)
+                                ImmutableList.of(imageUuid),
+                                UUID.fromString("7ffc2295-6875-4f40-bc65-827b8fd4535e") //autozone userid
                         );
 
                     }

@@ -26,7 +26,7 @@ public class TestPostgresShareItemDao {
                 UUID.randomUUID(), "name", "description",
                 Optional.of(RentalPricePerHour.random()),
                 Optional.of(Range.closed(DateTime.now(), DateTime.now().plusDays(1))),
-                ImmutableList.of(UUID.randomUUID())
+                ImmutableList.of(UUID.randomUUID()), UUID.randomUUID()
         );
 
         postgresDao.addShareItem(item, UUID.fromString("e7568b2c-2c0f-480e-9e34-08f9a4b807dd"));

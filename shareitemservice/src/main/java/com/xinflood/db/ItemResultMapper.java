@@ -42,8 +42,9 @@ public class ItemResultMapper implements ResultSetMapper<Item> {
         }
 
         List<UUID> imageUuids = Arrays.asList((UUID[]) r.getArray("image_uuids").getArray());
+        UUID ownerId = UUID.fromString(r.getString("user_id"));
 
-        return new Item(id, itemName, itemDescription, rentalPricePerHour, rentalPeriod, imageUuids);
+        return new Item(id, itemName, itemDescription, rentalPricePerHour, rentalPeriod, imageUuids, ownerId);
     }
 
 }

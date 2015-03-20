@@ -39,7 +39,7 @@ public class ShareItemController {
     }
 
     public Item addNewItem(UUID userId, RequestItemMetadata requestItemMetadata) throws IOException, ExecutionException, InterruptedException {
-        Item item = Item.of(requestItemMetadata);
+        Item item = Item.of(requestItemMetadata, userId);
         Future<Boolean> future = executorService.submit(new AddItemTask(item, shareItemDao, userId));
         boolean success = future.get();
         if(success) {

@@ -2,7 +2,7 @@ package com.xinflood.domainobject;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
@@ -21,6 +21,7 @@ public class Item {
     private final Optional<RentalPricePerHour> price;
     private final Optional<Range<DateTime>> rentalPeriod;
     private final ImmutableList<UUID> imageUuids;
+    private final UUID ownerId;
 
     @JsonCreator
     public Item(@JsonProperty("id") UUID id,
@@ -28,15 +29,16 @@ public class Item {
                 @JsonProperty("itemDescription") String itemDescription,
                 @JsonProperty("price") Optional<RentalPricePerHour> price,
                 @JsonProperty("rentalPeriod") Optional<Range<DateTime>> rentalPeriod,
-                @JsonProperty("imageUuids") List<UUID> imageUuids
+                @JsonProperty("imageUuids") List<UUID> imageUuids,
+                @JsonProperty("ownerId") UUID ownerId) {
 
-    ) {
         this.id = id;
         this.itemName = itemName;
         this.price = price;
         this.itemDescription = itemDescription;
         this.rentalPeriod = rentalPeriod;
         this.imageUuids = ImmutableList.copyOf(imageUuids);
+        this.ownerId = ownerId;
     }
 
     @JsonProperty
@@ -69,18 +71,24 @@ public class Item {
         return price;
     }
 
+    public UUID getOwnerId() {
+        return ownerId;
+    }
+
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
+        return Objects.toStringHelper(this)
                 .add("id", id)
                 .add("itemName", itemName)
                 .add("itemDescription", itemDescription)
+                .add("price", price)
                 .add("rentalPeriod", rentalPeriod)
                 .add("imageUuids", imageUuids)
+                .add("ownerId", ownerId)
                 .toString();
     }
 
-    public static Item of(RequestItemMetadata requestItemMetadata) {
+    public static Item of(RequestItemMetadata requestItemMetadata, UUID ownerId) {
 
         Optional<RentalPricePerHour> rentalPricePerHour = Optional.absent();
         if(requestItemMetadata.getPricePerHourInCent().isPresent()) {
@@ -98,7 +106,8 @@ public class Item {
                 requestItemMetadata.getItemDescription(),
                 rentalPricePerHour,
                 rentalRange,
-                requestItemMetadata.getImageUuids());
+                requestItemMetadata.getImageUuids(),
+                ownerId);
     }
 
 }

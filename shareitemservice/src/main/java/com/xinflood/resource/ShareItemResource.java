@@ -55,7 +55,7 @@ public class ShareItemResource {
         checkState(user.getId().equals(userId), "unauthorized access for %s", userId);
 
         Item created = shareItemController.addNewItem(userId, requestItemMetadata);
-        return Response.ok(ImmutableMap.of("item", created)).build();
+        return Response.ok(ImmutableMap.of("item", created, "owner", user.getId())).build();
     }
 
 
