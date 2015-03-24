@@ -1,6 +1,7 @@
 package com.xinflood.db;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.BoundType;
 import com.google.common.collect.Range;
 import com.xinflood.domainobject.Item;
 import com.xinflood.domainobject.RentalPricePerHour;
@@ -37,8 +38,13 @@ public class ItemResultMapper implements ResultSetMapper<Item> {
         Optional<Range<DateTime>> rentalPeriod = Optional.absent();
         Timestamp rentalStart = r.getTimestamp("rental_start");
         Timestamp rentalEnd = r.getTimestamp("rental_end");
+
         if(rentalStart != null && rentalEnd != null) {
             rentalPeriod = Optional.of(Range.closed(new DateTime(rentalStart), new DateTime(rentalEnd)));
+        } else if(rentalStart !=null ) {
+            rentalPeriod = Optional.of(Range.downTo(new DateTime(rentalStart), BoundType.CLOSED));
+        } else {
+            rentalPeriod = Optional.of(Range.upTo(new DateTime(rentalEnd), BoundType.CLOSED));
         }
 
         List<UUID> imageUuids = Arrays.asList((UUID[]) r.getArray("image_uuids").getArray());

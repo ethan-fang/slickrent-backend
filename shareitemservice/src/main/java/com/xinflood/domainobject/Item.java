@@ -89,6 +89,10 @@ public class Item {
     }
 
     public static Item of(RequestItemMetadata requestItemMetadata, UUID ownerId) {
+        return of(requestItemMetadata, ownerId, UUID.randomUUID());
+    }
+
+    public static Item of(RequestItemMetadata requestItemMetadata, UUID ownerId, UUID itemId) {
 
         Optional<RentalPricePerHour> rentalPricePerHour = Optional.absent();
         if(requestItemMetadata.getPricePerHourInCent().isPresent()) {
@@ -101,7 +105,7 @@ public class Item {
         }
 
         return new Item(
-                UUID.randomUUID(),
+                itemId,
                 requestItemMetadata.getItemName(),
                 requestItemMetadata.getItemDescription(),
                 rentalPricePerHour,

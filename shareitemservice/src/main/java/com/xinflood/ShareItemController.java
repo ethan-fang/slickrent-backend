@@ -49,6 +49,17 @@ public class ShareItemController {
         }
     }
 
+    public Item updateExistingItem(UUID userId, UUID itemId, RequestItemMetadata requestItemMetadata) throws IOException, ExecutionException, InterruptedException {
+        Item item = Item.of(requestItemMetadata, userId, itemId);
+        Future<Boolean> future = executorService.submit(new UpdateItemTask(item, shareItemDao, userId));
+        boolean success = future.get();
+        if(success) {
+            return item;
+        } else {
+            throw new IOException();
+        }
+    }
+
 
     public List<Item> getItems(int numItems, int offset, Optional<UUID> userId) throws ExecutionException, InterruptedException {
         Future<List<Item>> future = executorService.submit(new GetItemsTask(shareItemDao, numItems, offset , userId));
@@ -129,6 +140,26 @@ public class ShareItemController {
         @Override
         public Boolean call() throws Exception {
             shareItemDao.addShareItem(item, userId);
+            return true;
+        }
+    }
+
+   private static class UpdateItemTask implements Callable<Boolean> {
+
+        private final Item item;
+        private final ShareItemDao shareItemDao;
+        private final UUID userId;
+
+        private UpdateItemTask(Item item, ShareItemDao shareItemDao, UUID userId) {
+            this.item = item;
+            this.shareItemDao = shareItemDao;
+            this.userId = userId;
+        }
+
+
+        @Override
+        public Boolean call() throws Exception {
+            shareItemDao.updateShareItem(item, userId);
             return true;
         }
     }

@@ -1,0 +1,14 @@
+{
+  "fullName": "qian wu2",
+  "email": "qianwu.econ@gmail.com",
+  "phoneNumber": "4804525938",
+  "userAddress": {
+    "addressLine1": "919 La mesa terrace",
+    "city": "sunnyvale",
+    "state": "CALIFORNIA",
+    "zipCode": "94086",
+    "countryCode": "US"
+  },
+  "username": "qianwu",
+  "photoUuid": "e7568b2c-2c0f-480e-9e34-08f9a4b807dc"
+}

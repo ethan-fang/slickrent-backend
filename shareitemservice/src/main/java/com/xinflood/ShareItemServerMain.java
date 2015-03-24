@@ -22,7 +22,7 @@ import com.xinflood.dao.S3ImageDao;
 import com.xinflood.migration.DbMigrationBundle;
 import com.xinflood.migration.WithDbMigrationConfiguration;
 import com.xinflood.misc.autozone.AutoZoneDataLoaderCommand;
-import com.xinflood.resource.AuthResource;
+import com.xinflood.resource.UserResource;
 import com.xinflood.resource.CategoryResource;
 import com.xinflood.resource.ImageResource;
 import com.xinflood.resource.ShareItemResource;
@@ -89,14 +89,18 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
         final DBIFactory factory = new DBIFactory();
         final DBI dbi = factory.build(environment, config.getDatabase(), "proximity");
 
+        ExecutorService executorService = getManagedListeningExecutorService(environment, 100, "item process pool");
+
         final ImageDao imageDao = new S3ImageDao(s3Client, config.getS3BucketName());
         final PostgresDao postgresDao = new PostgresDao(dbi);
+
         final ShareItemController shareItemController = new ShareItemController(
-                config, imageDao, postgresDao,
-                getManagedListeningExecutorService(environment, 100, "item process pool")
-        );
+                config, imageDao, postgresDao, executorService);
+        final UserController userController = new UserController(postgresDao, executorService);
+
+
         final ShareItemResource shareItemResource = new ShareItemResource(shareItemController, environment.getObjectMapper());
-        final AuthResource authResource = new AuthResource(postgresDao);
+        final UserResource userResource = new UserResource(userController);
         final ImageResource imageResource = new ImageResource(imageDao);
 
         final JsonNode categoryHierarchy;
@@ -107,7 +111,7 @@ public class ShareItemServerMain extends Application<ShareItemServerConfiguratio
         final CategoryResource categoryResource = new CategoryResource(categoryHierarchy);
 
         environment.jersey().register(shareItemResource);
-        environment.jersey().register(authResource);
+        environment.jersey().register(userResource);
         environment.jersey().register(imageResource);
         environment.jersey().register(categoryResource);
 

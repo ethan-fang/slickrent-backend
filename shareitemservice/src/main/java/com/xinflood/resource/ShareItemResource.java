@@ -16,6 +16,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
@@ -52,12 +54,33 @@ public class ShareItemResource {
             @ApiParam(required = true, value = "user id") @PathParam("userId") UUID userId,
             RequestItemMetadata requestItemMetadata
     ) throws IOException, ExecutionException, InterruptedException {
+        checkNotNull(userId);
         checkState(user.getId().equals(userId), "unauthorized access for %s", userId);
 
         Item created = shareItemController.addNewItem(userId, requestItemMetadata);
         return Response.ok(ImmutableMap.of("item", created, "owner", user.getId())).build();
     }
 
+
+
+    @PUT
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Path("/{userId}/{itemId}")
+    @ApiOperation(value = "update an existing item under a given user", response = String.class)
+    public Response updateItem(
+        @Auth User user,
+        @ApiParam(required = true, value = "user id") @PathParam("userId") UUID userId,
+        @ApiParam(required = true, value = "item id") @PathParam("itemId") UUID itemId,
+        RequestItemMetadata requestItemMetadata
+    ) throws InterruptedException, ExecutionException, IOException {
+        checkNotNull(userId);
+        checkNotNull(itemId);
+        checkState(user.getId().equals(userId), "unauthorized access for %s", userId);
+
+        Item updated = shareItemController.updateExistingItem(userId, itemId, requestItemMetadata);
+
+        return Response.ok(ImmutableMap.of("item", updated, "owner", user.getId())).build();
+    }
 
     @GET
     @ApiOperation(value = "get items for an optional user", response = String.class)

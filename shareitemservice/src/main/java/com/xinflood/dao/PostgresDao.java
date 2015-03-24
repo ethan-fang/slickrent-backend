@@ -10,10 +10,12 @@ import com.xinflood.db.ItemResultMapper;
 import com.xinflood.db.PostgresUuidSqlArrayArgumentFactory;
 import com.xinflood.db.SqlArray;
 import com.xinflood.db.UserMapper;
+import com.xinflood.db.UserProfileResultMapper;
 import com.xinflood.domainobject.Item;
 import com.xinflood.domainobject.LoginPlatform;
 import com.xinflood.domainobject.SocialSignInRequest;
 import com.xinflood.domainobject.User;
+import com.xinflood.domainobject.UserProfile;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.skife.jdbi.v2.DBI;
@@ -73,6 +75,49 @@ public class PostgresDao implements ShareItemDao, UserDao {
             if(rowsModified != 1) {
                 LOG.error("fail to upload item to db %s", item);
                 throw new IllegalStateException("failed to upload item to db");
+            }
+
+            return null;
+        };
+        dbi.withHandle(callback);
+
+    }
+
+    @Override
+    public void updateShareItem(Item item, UUID userId) {
+        HandleCallback<Void> callback = handle -> {
+            Update update = handle.createStatement("update_item");
+            update.bind("id", item.getId());
+            update.bind("item_name", item.getItemName());
+            update.bind("item_description", item.getItemDescription());
+            update.bind("image_uuids", SqlArray.arrayOf(UUID.class, item.getImageUuids()));
+
+            if(item.getPrice().isPresent()) {
+                update.bind("price_usd_cent_per_min", item.getPrice().get().getAmount().getAmountMinorInt());
+            } else {
+                update.bind("price_usd_cent_per_min", 0);
+            }
+
+            DateTime lowerBound = null;
+            DateTime upperBound = null;
+            if(item.getRentalPeriod().isPresent()) {
+                if(item.getRentalPeriod().get().hasLowerBound()) {
+                    lowerBound = item.getRentalPeriod().get().lowerEndpoint();
+                }
+
+                if(item.getRentalPeriod().get().hasUpperBound()) {
+                    upperBound = item.getRentalPeriod().get().upperEndpoint();
+                }
+            }
+
+            update.bind("rental_start", lowerBound);
+            update.bind("rental_end", upperBound);
+
+
+            int rowsModified = update.execute();
+            if(rowsModified != 1) {
+                LOG.error("fail to update item to db %s", item);
+                throw new IllegalStateException("failed to update item to db");
             }
 
             return null;
@@ -209,6 +254,61 @@ public class PostgresDao implements ShareItemDao, UserDao {
 
         return dbi.withHandle(callback);
     }
+
+
+
+    public Optional<UserProfile> getUserProfileByUserId(UUID userId) {
+        HandleCallback<Optional<UserProfile>> callback = handle -> {
+            Query<Map<String, Object>> query = handle.createQuery("get_user_profile_by_user_id");
+            query.bind("user_id", userId);
+            UserProfile userProfile = query.map(UserProfileResultMapper.INSTANCE).first();
+
+            return Optional.fromNullable(userProfile);
+        };
+
+        return dbi.withHandle(callback);
+    }
+
+    public UUID createOrUpdateUserProfile(UserProfile userProfile, UUID userId) {
+        HandleCallback<UUID> callback = handle -> {
+            Query<Map<String, Object>> query = handle.createQuery("upsert_user_profile");
+
+            query.define("id", UUID.randomUUID())
+                    .define("username", userProfile.getUsername())
+                    .define("email", userProfile.getEmail())
+                    .define("photo_uuid", userProfile.getPhotoUuid())
+                    .define("full_name", userProfile.getFullName())
+                    .define("phone_number", userProfile.getPhoneNumber())
+                    .define("address_line1", userProfile.getUserAddress().getAddressLine1())
+                    .define("address_line2", userProfile.getUserAddress().getAddressLine2().or(""))
+                    .define("city", userProfile.getUserAddress().getCity())
+                    .define("state", userProfile.getUserAddress().getState())
+                    .define("zip_code", userProfile.getUserAddress().getZipCode())
+                    .define("country_code", userProfile.getUserAddress().getCountryCode())
+                    .define("user_id", userId)
+                    .bind("username", userProfile.getUsername())
+                    .bind("email", userProfile.getEmail())
+                    .bind("photo_uuid", userProfile.getPhotoUuid())
+                    .bind("full_name", userProfile.getFullName())
+                    .bind("phone_number", userProfile.getPhoneNumber())
+                    .bind("address_line1", userProfile.getUserAddress().getAddressLine1())
+                    .bind("address_line2", userProfile.getUserAddress().getAddressLine2().or(""))
+                    .bind("city", userProfile.getUserAddress().getCity())
+                    .bind("state", userProfile.getUserAddress().getState())
+                    .bind("zip_code", userProfile.getUserAddress().getZipCode())
+                    .bind("country_code", userProfile.getUserAddress().getCountryCode())
+                    .bind("user_id", userId)
+                    .bind("updated_time", DateTime.now());
+
+
+            String updatedUserProfileId = query.map(new StringMapper()).first();
+
+            return UUID.fromString(updatedUserProfileId);
+        };
+
+        return dbi.withHandle(callback);
+    }
+
 
     private String createNewAccessToken(String username) {
         String keySource = username + DateTime.now().toString() + ThreadLocalRandom.current().nextInt();

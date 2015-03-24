@@ -5,6 +5,18 @@ INSERT INTO slickrent.item (id, item_name, item_description, price_usd_cent_per_
 VALUES (:id, :item_name, :item_description, :price_usd_cent_per_min,:rental_start, :rental_end, :image_uuids, :user_id)
 >>
 
+update_item() ::= <<
+UPDATE slickrent.item
+SET
+    item_name =:item_name,
+    item_description=:item_description,
+    price_usd_cent_per_min=:price_usd_cent_per_min,
+    rental_start=:rental_start,
+    rental_end=:rental_end,
+    image_uuids=:image_uuids
+WHERE id = :id;
+>>
+
 retrieve_items(size, userId) ::= <<
 SELECT *
 FROM slickrent.item
@@ -50,6 +62,7 @@ FROM slickrent.user
 WHERE username=:username and password=:password
 >>
 
+
 upsert_user_social_login(id, username, access_token, login_platform) ::= <<
 WITH
   platform_id AS (
@@ -59,12 +72,56 @@ WITH
     VALUES (uuid('<id>'), '<username>', '<access_token>', (select * from platform_id))
   ),
   updated AS (
-    UPDATE slickrent.user set access_token=:access_token where username=:username and login_platform_id in (select * from platform_id)
+    UPDATE slickrent.user SET access_token=:access_token where username=:username and login_platform_id in (select * from platform_id)
     RETURNING *
   ),
   inserted as (
     INSERT INTO slickrent.user (id, username, access_token, login_platform_id)
     SELECT id, username, access_token, login_platform_id
+    FROM new_data
+    WHERE NOT EXISTS (
+        SELECT 1 FROM updated
+    )
+    RETURNING *
+  )
+SELECT id
+FROM inserted
+UNION ALL
+SELECT id
+FROM updated
+>>
+
+
+get_user_profile_by_user_id() ::= <<
+SELECT *
+FROM slickrent.user_profile
+WHERE user_id = :user_id
+>>
+
+upsert_user_profile(
+    id, username, email, photo_uuid,
+    full_name, phone_number, address_line1, address_line2,
+    city, state, zip_code, country_code, user_id) ::= <<
+WITH
+  new_data (id, username, email, photo_uuid, full_name, phone_number, address_line1, address_line2,
+            city, state, zip_code, country_code, user_id) AS (
+    VALUES (uuid('<id>'), '<username>', '<email>', uuid('<photo_uuid>'), '<full_name>', '<phone_number>', '<address_line1>',
+            '<address_line2>', '<city>', '<state>', '<zip_code>', '<country_code>', uuid('<user_id>'))
+  ),
+  updated AS (
+    UPDATE slickrent.user_profile
+    SET
+    username=:username, email=:email, photo_uuid=:photo_uuid, full_name=:full_name,
+    phone_number=:phone_number, address_line1=:address_line1, address_line2=:address_line1, city=:city,
+    state=:state, zip_code=:zip_code, country_code=:country_code, updated_time=:updated_time
+    where user_id = :user_id
+    RETURNING *
+  ),
+  inserted as (
+    INSERT INTO slickrent.user_profile (id, username, email, photo_uuid,
+                                       full_name, phone_number, address_line1, address_line2,
+                                       city, state, zip_code, country_code, user_id)
+    SELECT *
     FROM new_data
     WHERE NOT EXISTS (
         SELECT 1 FROM updated
