@@ -47,6 +47,10 @@ public class UserController {
         return executorService.submit(new UpdateSocialLogin(userDao, socialSignInRequest)).get();
     }
 
+    public Optional<UUID> updatePassword(UUID userId, String oldPassword, String newPassword) throws ExecutionException, InterruptedException {
+        return executorService.submit(new UpdatePassword(userDao, userId, oldPassword, newPassword)).get();
+    }
+
     private static class FindUserByUsernameAndPassword implements Callable<Optional<User>> {
 
         private final UserDao userDao;
@@ -132,6 +136,26 @@ public class UserController {
         @Override
         public UUID call() throws Exception {
             return userDao.createOrUpdateUserProfile(userProfile, userId);
+        }
+    }
+
+    private static class UpdatePassword implements  Callable<Optional<UUID>> {
+
+        private final UserDao userDao;
+        private final UUID userId;
+        private final String oldPassword;
+        private final String newPassword;
+
+        private UpdatePassword(UserDao userDao, UUID userId, String oldPassword, String newPassword) {
+            this.userDao = userDao;
+            this.userId = userId;
+            this.oldPassword = oldPassword;
+            this.newPassword = newPassword;
+        }
+
+        @Override
+        public Optional<UUID> call() throws Exception {
+            return userDao.updatePassword(userId, oldPassword, newPassword);
         }
     }
 

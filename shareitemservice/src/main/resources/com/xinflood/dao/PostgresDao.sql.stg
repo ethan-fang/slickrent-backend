@@ -62,6 +62,11 @@ FROM slickrent.user
 WHERE username=:username and password=:password
 >>
 
+update_password() ::= <<
+UPDATE slickrent.user
+    SET password=:new_password
+    WHERE id=:user_id and password=:old_password
+>>
 
 upsert_user_social_login(id, username, access_token, login_platform) ::= <<
 WITH

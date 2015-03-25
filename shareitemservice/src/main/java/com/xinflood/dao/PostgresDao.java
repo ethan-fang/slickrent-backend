@@ -257,6 +257,7 @@ public class PostgresDao implements ShareItemDao, UserDao {
 
 
 
+    @Override
     public Optional<UserProfile> getUserProfileByUserId(UUID userId) {
         HandleCallback<Optional<UserProfile>> callback = handle -> {
             Query<Map<String, Object>> query = handle.createQuery("get_user_profile_by_user_id");
@@ -269,6 +270,7 @@ public class PostgresDao implements ShareItemDao, UserDao {
         return dbi.withHandle(callback);
     }
 
+    @Override
     public UUID createOrUpdateUserProfile(UserProfile userProfile, UUID userId) {
         HandleCallback<UUID> callback = handle -> {
             Query<Map<String, Object>> query = handle.createQuery("upsert_user_profile");
@@ -309,6 +311,25 @@ public class PostgresDao implements ShareItemDao, UserDao {
         return dbi.withHandle(callback);
     }
 
+    @Override
+    public Optional<UUID> updatePassword(UUID userId, String oldPassword, String newPassword) {
+        HandleCallback<Optional<UUID>> callback = handle -> {
+            Update update = handle.createStatement("update_password");
+            update.bind("user_id", userId);
+            update.bind("old_password", oldPassword);
+            update.bind("new_password", newPassword);
+
+            int rowAffected = update.execute();
+
+            if(rowAffected != 1) {
+                return Optional.absent();
+            } else {
+                return Optional.of(userId);
+            }
+        };
+
+        return dbi.withHandle(callback);
+    }
 
     private String createNewAccessToken(String username) {
         String keySource = username + DateTime.now().toString() + ThreadLocalRandom.current().nextInt();

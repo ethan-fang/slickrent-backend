@@ -11,6 +11,7 @@ import com.xinflood.domainobject.SocialSignInRequest;
 import com.xinflood.domainobject.User;
 import com.xinflood.domainobject.UserProfile;
 import com.xinflood.domainobject.UsernamePasswordPair;
+import com.xinflood.request.PasswordPair;
 import io.dropwizard.auth.Auth;
 
 import javax.ws.rs.Consumes;
@@ -101,6 +102,30 @@ public class UserResource {
                     .build();
         }
     }
+
+    @PUT
+    @Path("/password/{userId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "new user sign up", response = String.class)
+    public Response updatePassword(
+            @Auth User user,
+            @ApiParam(required = true, value = "user id") @PathParam("userId") UUID userId,
+            PasswordPair passwordPair
+
+    ) throws ExecutionException, InterruptedException {
+
+        Optional<UUID> updatedUserId = userController.updatePassword(userId, passwordPair.getOldPassword(), passwordPair.getNewPassword());
+
+        if(updatedUserId.isPresent()) {
+            return Response.ok(ImmutableMap.of("userId", updatedUserId.get())).build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(ImmutableMap.of("error", "username and password pair doesn't match the existing one"))
+                    .build();
+        }
+    }
+
+
 
 
     @GET

@@ -17,6 +17,7 @@ public interface UserDao {
     Optional<User> findUserByToken(String token);
 
     Optional<User> updateSocialLogin(SocialSignInRequest socialSignInRequest);
+    Optional<UUID> updatePassword(UUID userId, String oldPassword, String newPassword);
 
 
     Optional<UserProfile> getUserProfileByUserId(UUID userId);
